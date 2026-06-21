@@ -5,11 +5,18 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import sys
 from datetime import datetime
 from pathlib import Path
 
 from core.frameworks import export_framework_json, seed_frameworks
-from core.build_profile import APP_DATA_FOLDER, DEMO_ORG_NAME, IS_DEMO_BUILD
+from core.build_profile import (
+    DEMO_ORG_NAME,
+    FACTORY_RESET_VERSION,
+    IS_DEMO_BUILD,
+    PROFILE_SETTING_KEYS,
+    resolve_data_folder,
+)
 from core.settings import DEFAULTS, get_setting, set_setting
 
 DEMO_NOTE = "[DEMO] Evaluación de demostración — no usar en informes oficiales"
@@ -66,11 +73,12 @@ CREATE TABLE IF NOT EXISTS settings (
 
 
 def get_app_data_dir() -> Path:
+    folder = resolve_data_folder()
     appdata = os.environ.get("APPDATA")
     if appdata:
-        base = Path(appdata) / APP_DATA_FOLDER
+        base = Path(appdata) / folder
     else:
-        base = Path.home() / f".{APP_DATA_FOLDER.lower()}"
+        base = Path.home() / f".{folder.lower()}"
     base.mkdir(parents=True, exist_ok=True)
     return base
 
@@ -80,7 +88,7 @@ def get_db_path() -> Path:
 
 
 def get_documents_dir() -> Path:
-    docs = Path.home() / "Documents" / APP_DATA_FOLDER
+    docs = Path.home() / "Documents" / resolve_data_folder()
     docs.mkdir(parents=True, exist_ok=True)
     return docs
 
@@ -94,6 +102,8 @@ def connect(db_path: Path | None = None) -> sqlite3.Connection:
 
 
 def initialize(db_path: Path | None = None) -> sqlite3.Connection:
+    path = db_path or get_db_path()
+    is_new_install = not path.exists()
     conn = connect(db_path)
     conn.executescript(SCHEMA)
 
@@ -116,10 +126,41 @@ def initialize(db_path: Path | None = None) -> sqlite3.Connection:
         seed_frameworks(conn)
 
     _migrate_legacy_demo_flag(conn)
+    _ensure_production_factory(conn, is_new_install=is_new_install)
     _bootstrap_demo_build(conn)
     export_framework_json()
     conn.commit()
     return conn
+
+
+def _ensure_production_factory(conn: sqlite3.Connection, *, is_new_install: bool) -> None:
+    """Production .exe must ship without developer profile, photos or assessments."""
+    if IS_DEMO_BUILD or not getattr(sys, "frozen", False):
+        return
+
+    from core.user_avatar import remove_avatar
+
+    current = get_setting(conn, "factory_reset_version", "")
+    target = FACTORY_RESET_VERSION or "0"
+    if current == target and not is_new_install:
+        return
+
+    org_id = get_organization_id(conn)
+    conn.execute("DELETE FROM recommendations")
+    conn.execute("DELETE FROM assessments WHERE organization_id = ?", (org_id,))
+    remove_avatar(conn)
+
+    for key in PROFILE_SETTING_KEYS:
+        if key in DEFAULTS:
+            set_setting(conn, key, DEFAULTS[key])
+
+    set_setting(conn, "demo_mode", "0")
+    set_setting(conn, "org_name", DEFAULTS["org_name"])
+    set_setting(conn, "edition", DEFAULTS["edition"])
+    set_setting(conn, "last_review", "")
+    set_setting(conn, "factory_reset_version", target)
+    conn.execute("UPDATE organizations SET name = ? WHERE id = ?", (DEFAULTS["org_name"], org_id))
+    conn.commit()
 
 
 def _bootstrap_demo_build(conn: sqlite3.Connection) -> None:
