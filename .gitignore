@@ -37,4 +37,7 @@ error.log
 # Material ajeno al proyecto (no versionar)
 Pinterest-Portfolio Yoandy/
 *.zip
-*.mp4
+!release-packages/*.zip
+
+# Staging de empaquetado
+release-packages/_staging/

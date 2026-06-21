@@ -65,6 +65,8 @@ La versión demo arranca con evaluaciones ficticias, badge **DEMO**, organizaci�
 build_all.bat
 ```
 
+Los binarios empaquetados para distribución están en [`release-packages/`](release-packages/) (v1.0.0: producción + demo).
+
 ### Compilación manual
 
 ```bash
