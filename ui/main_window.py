@@ -13,6 +13,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QMainWindow
 
 from ui.bridge import Bridge
+from core.build_profile import WINDOW_TITLE_SUFFIX
 
 
 def project_root() -> Path:
@@ -65,7 +66,7 @@ class MainWindow(QMainWindow):
     def __init__(self, conn) -> None:
         super().__init__()
         self._conn = conn
-        self.setWindowTitle("Norvik — Governance & Compliance")
+        self.setWindowTitle(f"Norvik — Governance & Compliance{WINDOW_TITLE_SUFFIX}")
         self.setMinimumSize(720, 480)
 
         icon_path = ASSETS / "icon.ico"

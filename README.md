@@ -39,12 +39,38 @@ En Windows también puedes usar `run.bat`.
 
 ## Compilar ejecutable
 
+### Producción (limpia, sin datos ficticios)
+
+```bash
+build_production.bat
+```
+
+Salida: `dist\Norvik\Norvik.exe`  
+Datos de usuario: `%APPDATA%\Norvik\`
+
+### Demo (presentaciones, datos ficticios precargados)
+
+```bash
+build_demo.bat
+```
+
+Salida: `dist\Norvik-Demo\Norvik-Demo.exe`  
+Datos de usuario: `%APPDATA%\Norvik-Demo\` (carpeta separada; no contamina producción)
+
+La versión demo arranca con evaluaciones ficticias, badge **DEMO**, organización *Acme Corp — Demo GRC* y título *Demo Edition*.
+
+### Ambas a la vez
+
+```bash
+build_all.bat
+```
+
+### Compilación manual
+
 ```bash
 pip install pyinstaller
 pyinstaller norvik.spec --noconfirm
 ```
-
-El binario queda en `dist\Norvik\Norvik.exe`.
 
 ## Estructura del proyecto
 

@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 from core.frameworks import export_framework_json, seed_frameworks
+from core.build_profile import APP_DATA_FOLDER, DEMO_ORG_NAME, IS_DEMO_BUILD
 from core.settings import DEFAULTS, get_setting, set_setting
 
 DEMO_NOTE = "[DEMO] Evaluación de demostración — no usar en informes oficiales"
@@ -67,9 +68,9 @@ CREATE TABLE IF NOT EXISTS settings (
 def get_app_data_dir() -> Path:
     appdata = os.environ.get("APPDATA")
     if appdata:
-        base = Path(appdata) / "Norvik"
+        base = Path(appdata) / APP_DATA_FOLDER
     else:
-        base = Path.home() / ".norvik"
+        base = Path.home() / f".{APP_DATA_FOLDER.lower()}"
     base.mkdir(parents=True, exist_ok=True)
     return base
 
@@ -79,7 +80,7 @@ def get_db_path() -> Path:
 
 
 def get_documents_dir() -> Path:
-    docs = Path.home() / "Documents" / "Norvik"
+    docs = Path.home() / "Documents" / APP_DATA_FOLDER
     docs.mkdir(parents=True, exist_ok=True)
     return docs
 
@@ -115,9 +116,24 @@ def initialize(db_path: Path | None = None) -> sqlite3.Connection:
         seed_frameworks(conn)
 
     _migrate_legacy_demo_flag(conn)
+    _bootstrap_demo_build(conn)
     export_framework_json()
     conn.commit()
     return conn
+
+
+def _bootstrap_demo_build(conn: sqlite3.Connection) -> None:
+    """Demo executable: separate data folder + fictitious assessments on first run."""
+    if not IS_DEMO_BUILD:
+        return
+    assessed = conn.execute("SELECT COUNT(*) AS c FROM assessments").fetchone()["c"]
+    if int(assessed) == 0:
+        load_demo_assessments(conn)
+    set_setting(conn, "edition", "Demo Edition")
+    set_setting(conn, "org_name", DEMO_ORG_NAME)
+    org_id = get_organization_id(conn)
+    conn.execute("UPDATE organizations SET name = ? WHERE id = ?", (DEMO_ORG_NAME, org_id))
+    conn.commit()
 
 
 def _migrate_legacy_demo_flag(conn: sqlite3.Connection) -> None:

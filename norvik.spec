@@ -1,10 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-import sys
+import os
 from pathlib import Path
 
 block_cipher = None
 root = Path(SPECPATH)
+profile = os.environ.get("NORVIK_BUILD", "production")
+app_name = "Norvik-Demo" if profile == "demo" else "Norvik"
 
 a = Analysis(
     [str(root / 'main.py')],
@@ -20,6 +22,11 @@ a = Analysis(
         'PySide6.QtWebEngineCore',
         'PySide6.QtWebChannel',
         'reportlab.graphics.barcode',
+        'keyring',
+        'keyring.backends',
+        'keyring.backends.Windows',
+        'win32ctypes',
+        'win32ctypes.pywin32',
     ],
     hookspath=[],
     hooksconfig={},
@@ -38,7 +45,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Norvik',
+    name=app_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -60,5 +67,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Norvik',
+    name=app_name,
 )
