@@ -1,0 +1,658 @@
+{
+  "code": "ISO27001",
+  "name": "ISO 27001:2022",
+  "version": "2022",
+  "controls": [
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.1",
+      "title": "Políticas de seguridad",
+      "description": "Políticas de seguridad de la información definidas y aprobadas.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.2",
+      "title": "Roles y responsabilidades",
+      "description": "Roles y responsabilidades de seguridad definidos.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.3",
+      "title": "Segregación de funciones",
+      "description": "Funciones conflictivas segregadas.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.4",
+      "title": "Responsabilidades de gestión",
+      "description": "La dirección exige cumplimiento de políticas.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.5",
+      "title": "Contacto con autoridades",
+      "description": "Contacto con autoridades y grupos de interés.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.6",
+      "title": "Contacto con grupos especiales",
+      "description": "Contacto con grupos de seguridad y foros.",
+      "weight": 1
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.7",
+      "title": "Inteligencia de amenazas",
+      "description": "Información sobre amenazas recopilada y analizada.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.8",
+      "title": "Seguridad en gestión de proyectos",
+      "description": "Seguridad integrada en gestión de proyectos.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.9",
+      "title": "Inventario de activos",
+      "description": "Inventario de activos de información.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.10",
+      "title": "Uso aceptable",
+      "description": "Reglas de uso aceptable de activos.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.11",
+      "title": "Devolución de activos",
+      "description": "Activos devueltos al cambio o terminación.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.12",
+      "title": "Clasificación de información",
+      "description": "Información clasificada según necesidades.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.13",
+      "title": "Etiquetado de información",
+      "description": "Procedimientos de etiquetado implementados.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.14",
+      "title": "Transferencia de información",
+      "description": "Reglas para transferencia de información.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.15",
+      "title": "Control de acceso",
+      "description": "Reglas de control de acceso establecidas.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.16",
+      "title": "Gestión de identidades",
+      "description": "Ciclo de vida de identidades gestionado.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.17",
+      "title": "Información de autenticación",
+      "description": "Asignación y gestión segura de credenciales.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.18",
+      "title": "Derechos de acceso",
+      "description": "Derechos de acceso provisionados y revisados.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.19",
+      "title": "Seguridad con proveedores",
+      "description": "Seguridad en relaciones con proveedores.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.20",
+      "title": "Seguridad en acuerdos",
+      "description": "Requisitos de seguridad en acuerdos con proveedores.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.21",
+      "title": "Seguridad en cadena ICT",
+      "description": "Gestión de riesgos en cadena de suministro ICT.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.22",
+      "title": "Monitoreo de proveedores",
+      "description": "Monitoreo y revisión de servicios de proveedores.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.23",
+      "title": "Seguridad en servicios cloud",
+      "description": "Adquisición, uso y salida de servicios cloud.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.24",
+      "title": "Planificación de respuesta",
+      "description": "Planificación y preparación para incidentes.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.25",
+      "title": "Evaluación de eventos",
+      "description": "Eventos evaluados y clasificados.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.26",
+      "title": "Respuesta a incidentes",
+      "description": "Incidentes respondidos según procedimientos.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.27",
+      "title": "Aprendizaje de incidentes",
+      "description": "Conocimiento de incidentes utilizado para mejorar.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.28",
+      "title": "Recopilación de evidencia",
+      "description": "Evidencia recopilada y preservada.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.29",
+      "title": "Seguridad durante interrupciones",
+      "description": "Seguridad mantenida durante interrupciones.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.30",
+      "title": "Continuidad del negocio ICT",
+      "description": "Continuidad del negocio ICT planificada.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.31",
+      "title": "Requisitos legales",
+      "description": "Requisitos legales identificados y abordados.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.32",
+      "title": "Derechos de propiedad intelectual",
+      "description": "Derechos de PI protegidos.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.33",
+      "title": "Protección de registros",
+      "description": "Registros protegidos contra pérdida y falsificación.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.34",
+      "title": "Privacidad y PII",
+      "description": "Privacidad y PII protegidas según requisitos.",
+      "weight": 3
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.35",
+      "title": "Revisión independiente",
+      "description": "Enfoque de seguridad revisado independientemente.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.36",
+      "title": "Cumplimiento de políticas",
+      "description": "Cumplimiento de políticas revisado.",
+      "weight": 2
+    },
+    {
+      "domain": "Organizativos",
+      "control_id": "A.5.37",
+      "title": "Procedimientos operativos",
+      "description": "Procedimientos operativos documentados.",
+      "weight": 2
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.1",
+      "title": "Screening",
+      "description": "Verificación de antecedentes del personal.",
+      "weight": 2
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.2",
+      "title": "Términos de empleo",
+      "description": "Contratos incluyen responsabilidades de seguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.3",
+      "title": "Concienciación y formación",
+      "description": "Personal recibe concienciación y formación.",
+      "weight": 3
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.4",
+      "title": "Proceso disciplinario",
+      "description": "Proceso disciplinario por incumplimiento.",
+      "weight": 2
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.5",
+      "title": "Responsabilidades post-empleo",
+      "description": "Responsabilidades vigentes tras terminación.",
+      "weight": 2
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.6",
+      "title": "Acuerdos de confidencialidad",
+      "description": "Acuerdos de confidencialidad firmados.",
+      "weight": 2
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.7",
+      "title": "Trabajo remoto",
+      "description": "Seguridad en trabajo remoto.",
+      "weight": 3
+    },
+    {
+      "domain": "Personas",
+      "control_id": "A.6.8",
+      "title": "Reporte de eventos",
+      "description": "Mecanismo para reportar eventos de seguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.1",
+      "title": "Perímetros de seguridad",
+      "description": "Perímetros de seguridad física definidos.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.2",
+      "title": "Controles de acceso físico",
+      "description": "Acceso físico controlado.",
+      "weight": 3
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.3",
+      "title": "Seguridad de oficinas",
+      "description": "Oficinas y salas protegidas.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.4",
+      "title": "Monitoreo físico",
+      "description": "Instalaciones monitoreadas.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.5",
+      "title": "Protección contra amenazas",
+      "description": "Protección contra amenazas físicas y ambientales.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.6",
+      "title": "Trabajo en áreas seguras",
+      "description": "Procedimientos para áreas seguras.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.7",
+      "title": "Escritorio limpio",
+      "description": "Política de escritorio y pantalla limpios.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.8",
+      "title": "Ubicación de equipos",
+      "description": "Equipos ubicados para reducir riesgos.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.9",
+      "title": "Activos fuera de instalaciones",
+      "description": "Activos fuera de instalaciones protegidos.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.10",
+      "title": "Medios de almacenamiento",
+      "description": "Medios gestionados durante ciclo de vida.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.11",
+      "title": "Servicios de soporte",
+      "description": "Servicios de soporte protegidos.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.12",
+      "title": "Cableado",
+      "description": "Cableado de energía y telecom protegido.",
+      "weight": 1
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.13",
+      "title": "Mantenimiento de equipos",
+      "description": "Equipos mantenidos correctamente.",
+      "weight": 2
+    },
+    {
+      "domain": "Físicos",
+      "control_id": "A.7.14",
+      "title": "Eliminación segura",
+      "description": "Activos eliminados o reutilizados de forma segura.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.1",
+      "title": "Dispositivos de usuario",
+      "description": "Información en dispositivos de usuario protegida.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.2",
+      "title": "Derechos de acceso privilegiado",
+      "description": "Accesos privilegiados restringidos y gestionados.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.3",
+      "title": "Restricción de acceso",
+      "description": "Acceso a información restringido.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.4",
+      "title": "Código fuente",
+      "description": "Acceso a código fuente controlado.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.5",
+      "title": "Autenticación segura",
+      "description": "Tecnologías de autenticación segura.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.6",
+      "title": "Capacidad",
+      "description": "Uso de recursos monitoreado y ajustado.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.7",
+      "title": "Protección contra malware",
+      "description": "Protección contra malware implementada.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.8",
+      "title": "Gestión de vulnerabilidades",
+      "description": "Vulnerabilidades técnicas gestionadas.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.9",
+      "title": "Gestión de configuración",
+      "description": "Configuraciones establecidas y documentadas.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.10",
+      "title": "Eliminación de información",
+      "description": "Información eliminada cuando ya no se requiere.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.11",
+      "title": "Enmascaramiento de datos",
+      "description": "Enmascaramiento según política.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.12",
+      "title": "Prevención de fuga",
+      "description": "Medidas contra fuga de datos.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.13",
+      "title": "Copias de seguridad",
+      "description": "Copias de seguridad realizadas y probadas.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.14",
+      "title": "Redundancia",
+      "description": "Redundancia de instalaciones de procesamiento.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.15",
+      "title": "Registro",
+      "description": "Registros generados y protegidos.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.16",
+      "title": "Actividades de monitoreo",
+      "description": "Redes y sistemas monitoreados.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.17",
+      "title": "Sincronización de reloj",
+      "description": "Relojes de sistemas sincronizados.",
+      "weight": 1
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.18",
+      "title": "Uso de programas privilegiados",
+      "description": "Uso de utilidades privilegiadas restringido.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.19",
+      "title": "Software en sistemas operativos",
+      "description": "Instalación de software controlada.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.20",
+      "title": "Seguridad de redes",
+      "description": "Redes y servicios de red asegurados.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.21",
+      "title": "Seguridad de servicios de red",
+      "description": "Servicios de red identificados y asegurados.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.22",
+      "title": "Segregación de redes",
+      "description": "Grupos de servicios segregados en redes.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.23",
+      "title": "Filtrado web",
+      "description": "Acceso a sitios externos gestionado.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.24",
+      "title": "Criptografía",
+      "description": "Uso efectivo de criptografía.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.25",
+      "title": "Ciclo de vida de desarrollo seguro",
+      "description": "Seguridad en ciclo de vida de desarrollo.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.26",
+      "title": "Requisitos de seguridad de aplicaciones",
+      "description": "Requisitos de seguridad identificados.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.27",
+      "title": "Arquitectura segura",
+      "description": "Principios de arquitectura segura aplicados.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.28",
+      "title": "Codificación segura",
+      "description": "Principios de codificación segura aplicados.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.29",
+      "title": "Pruebas de seguridad",
+      "description": "Pruebas de seguridad en desarrollo.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.30",
+      "title": "Desarrollo externalizado",
+      "description": "Desarrollo externalizado dirigido y monitoreado.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.31",
+      "title": "Separación de entornos",
+      "description": "Entornos de desarrollo, prueba y producción separados.",
+      "weight": 3
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.32",
+      "title": "Gestión de cambios",
+      "description": "Cambios en instalaciones controlados.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.33",
+      "title": "Información de prueba",
+      "description": "Información de prueba protegida.",
+      "weight": 2
+    },
+    {
+      "domain": "Tecnológicos",
+      "control_id": "A.8.34",
+      "title": "Protección en auditoría",
+      "description": "Actividades de auditoría planificadas.",
+      "weight": 2
+    }
+  ]
+}

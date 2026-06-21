@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Norvik — Governance & Compliance</title>
+  <link rel="icon" type="image/svg+xml" href="norvik-icon.svg" />
+  <link rel="stylesheet" href="themes.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="glass.css" />
+  <link rel="stylesheet" href="responsive.css" />
+  <link rel="stylesheet" href="loader.css" />
+  <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+<body>
+  <div class="norvik-loader" id="norvik-loader" role="status" aria-live="polite" aria-label="Cargando Norvik">
+    <div class="nl-grain" aria-hidden="true"></div>
+    <div class="nl-aura" aria-hidden="true"></div>
+    <div class="nl-flare nl-flare--a" aria-hidden="true"></div>
+    <div class="nl-flare nl-flare--b" aria-hidden="true"></div>
+    <div class="nl-stage">
+      <div class="nl-logo-wrap" aria-hidden="true">
+        <img class="nl-logo-img" src="norvik-logo.png" width="120" height="140" alt="" decoding="async" />
+        <div class="nl-wordmark">Norvik</div>
+      </div>
+      <div class="nl-tagline">Enterprise Governance, Risk &amp; Compliance</div>
+      <div class="nl-track" aria-hidden="true"><span class="nl-fill" id="nl-fill"></span></div>
+      <div class="nl-status">
+        <span class="nl-phase"><span class="nl-caret">&gt;</span><span id="nl-phase-text">Inicializando núcleo seguro</span></span>
+        <span class="nl-pct" id="nl-pct">0%</span>
+      </div>
+    </div>
+  </div>
+  <div class="grain"></div>
+  <div class="scene-bg" aria-hidden="true">
+    <div class="scene-bg__image" id="scene-bg-image"></div>
+    <div class="scene-bg__veil" id="scene-bg-veil"></div>
+    <div class="hero-glow hero-glow--back"></div>
+    <div class="hero-glow hero-glow--front"></div>
+  </div>
+
+  <div class="app-root">
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+    <div class="glass-panel norvik-shell">
+      <div class="norvik-layout" id="layout">
+        <aside class="norvik-sidebar">
+          <div class="norvik-brand">
+            <img class="norvik-brand-logo" src="norvik-logo.png" width="120" height="36" alt="Norvik" />
+            <div class="norvik-brand-text">
+              <span class="norvik-brand-name">Norvik</span>
+              <span class="norvik-brand-ver" id="brand-edition">Enterprise Edition</span>
+            </div>
+          </div>
+          <nav class="norvik-nav" aria-label="Navegación principal">
+            <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+            <button type="button" class="nav-item is-active" data-panel="dashboard">
+              <span data-icon="dashboard"></span><span>Dashboard</span>
+            </button>
+            <button type="button" class="nav-item alerts" data-panel="nist" data-fw="NIST_CSF2">
+              <span data-icon="nist"></span><span>NIST CSF 2.0</span>
+              <span class="badge" id="badge-nist" hidden>0</span>
+            </button>
+            <button type="button" class="nav-item" data-panel="iso" data-fw="ISO27001">
+              <span data-icon="iso"></span><span>ISO 27001:2022</span>
+            </button>
+            <button type="button" class="nav-item alerts" data-panel="cis" data-fw="CIS_V8">
+              <span data-icon="cis"></span><span>CIS Controls v8</span>
+              <span class="badge" id="badge-cis" hidden>0</span>
+            </button>
+            <button type="button" class="nav-item" data-panel="rgpd" data-fw="RGPD">
+              <span data-icon="rgpd"></span><span>RGPD</span>
+            </button>
+            <button type="button" class="nav-item" data-panel="reports">
+              <span data-icon="reports"></span><span>Informes PDF</span>
+            </button>
+            <button type="button" class="nav-item" data-panel="ai">
+              <span data-icon="ai"></span><span>Asistente IA</span>
+            </button>
+          </nav>
+          <div class="norvik-sidebar-foot">
+            <div class="norvik-status foot-text">
+              <span class="dot" id="ollama-dot"></span>
+              <span id="ollama-label">Ollama: comprobando...</span>
+            </div>
+            <div class="sidebar-foot-nav">
+              <button type="button" class="nav-item nav-item--foot" data-panel="settings">
+                <span data-icon="settings"></span><span>Configuración</span>
+              </button>
+              <button type="button" class="nav-item nav-item--foot" id="btn-support">
+                <span data-icon="help"></span><span>Soporte</span>
+              </button>
+            </div>
+            <div class="sidebar-user" id="sidebar-user" role="button" tabindex="0">
+              <span class="sidebar-user__avatar" id="sidebar-avatar">RC</span>
+              <div class="sidebar-user__meta foot-text">
+                <span class="sidebar-user__name" id="sidebar-user-name">Responsable</span>
+                <span class="sidebar-user__role" id="sidebar-user-role">Cumplimiento</span>
+              </div>
+            </div>
+            <button type="button" class="btn-collapse" id="btn-collapse">
+              <span class="chevron-wrap" data-icon="chevronLeft"></span><span class="collapse-label">Colapsar</span>
+            </button>
+          </div>
+        </aside>
+
+        <section class="norvik-main">
+          <header class="norvik-topbar">
+            <button type="button" class="ws-btn btn-nav-toggle" id="btn-nav-toggle" aria-label="Abrir menú de navegación">
+              <span data-icon="menu"></span>
+            </button>
+            <div class="norvik-topbar__title">
+              <h1 id="page-title">Governance & Compliance</h1>
+              <p id="page-subtitle">Última revisión: —</p>
+            </div>
+            <div class="topbar-search">
+              <span class="topbar-search__icon" data-icon="search"></span>
+              <input type="text" id="global-search" class="topbar-search__input" placeholder="Buscar controles, marcos o dominios..." autocomplete="off" />
+              <div class="search-results" id="search-results" hidden></div>
+            </div>
+            <div class="norvik-topbar__actions">
+              <button type="button" class="ws-btn" id="btn-sync">
+                <span data-icon="sync"></span><span class="ws-btn__label">Sincronizar</span>
+              </button>
+              <button type="button" class="ws-btn primary" id="btn-export">
+                <span data-icon="export"></span><span class="ws-btn__label">Exportar PDF</span>
+              </button>
+              <button type="button" class="icon-btn" id="btn-notifs" aria-label="Notificaciones">
+                <span data-icon="alerts"></span>
+                <span class="icon-btn__dot" id="notif-dot" hidden></span>
+              </button>
+              <div class="user-chip" id="user-chip" role="button" tabindex="0">
+                <span class="user-chip__avatar" id="user-avatar">RC</span>
+                <span class="user-chip__meta">
+                  <span class="user-chip__name" id="user-name">Responsable</span>
+                  <span class="user-chip__role" id="user-role">Cumplimiento</span>
+                </span>
+              </div>
+            </div>
+          </header>
+
+          <div class="norvik-work">
+            <div class="norvik-panel is-active" data-panel="dashboard">
+              <div class="sync-banner" id="sync-banner" hidden>
+                <span class="sync-banner__icon" data-icon="warning"></span>
+                <div class="sync-banner__body">
+                  <strong>Fallo de sincronización</strong>
+                  <span id="sync-banner-msg">No se pudo conectar con el motor de cumplimiento.</span>
+                </div>
+                <button type="button" class="ws-btn" id="sync-retry"><span data-icon="sync"></span><span>Reintentar</span></button>
+              </div>
+
+              <div class="dash-empty" id="dash-empty" hidden>
+                <nav class="dash-crumb dash-crumb--empty" aria-label="Miga de pan">
+                  <span>Inicio</span>
+                  <span class="dash-crumb__sep" data-icon="chevronRight"></span>
+                  <span class="dash-crumb__active">Dashboard</span>
+                </nav>
+                <div class="dash-empty__shell glass-box">
+                  <div class="dash-empty__hero">
+                    <div class="dash-empty__orbit">
+                      <div class="dash-empty__ring" aria-hidden="true"></div>
+                      <img class="dash-empty__logo" src="norvik-logo.png" width="120" height="140" alt="Norvik" />
+                      <div class="dash-empty__float dash-empty__float--a"><span data-icon="policy"></span></div>
+                      <div class="dash-empty__float dash-empty__float--b"><span data-icon="check"></span></div>
+                    </div>
+                  </div>
+                  <h2>No hay datos de cumplimiento todavía</h2>
+                  <p>Comience configurando su primer marco normativo o realizando una evaluación de madurez para visualizar el estado de riesgo de su organización.</p>
+                  <div class="dash-empty__actions">
+                    <button type="button" class="ws-btn primary" id="empty-start">
+                      <span data-icon="verified"></span><span>Comenzar configuración</span>
+                    </button>
+                    <button type="button" class="ws-btn" id="empty-import">
+                      <span data-icon="upload"></span><span>Importar datos</span>
+                    </button>
+                  </div>
+                  <div class="dash-empty__tips">
+                    <div class="dash-empty__tip">
+                      <span class="dash-empty__tip-icon" data-icon="sparkle"></span>
+                      <strong>Marcos sugeridos</strong>
+                      <span>ISO 27001, NIST CSF o CIS Controls según su sector.</span>
+                    </div>
+                    <div class="dash-empty__tip">
+                      <span class="dash-empty__tip-icon" data-icon="policy"></span>
+                      <strong>Guía de inicio</strong>
+                      <span>Mapee controles de cumplimiento en pocos minutos.</span>
+                    </div>
+                    <div class="dash-empty__tip">
+                      <span class="dash-empty__tip-icon" data-icon="group"></span>
+                      <strong>Invitar equipo</strong>
+                      <span>Colabore con oficiales de privacidad y auditores.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-empty__ghost" aria-hidden="true">
+                  <div class="dash-ghost-card dash-ghost-card--wide"></div>
+                  <div class="dash-ghost-card dash-ghost-card--narrow"></div>
+                </div>
+              </div>
+
+              <div id="dash-content">
+              <nav class="dash-crumb" aria-label="Miga de pan">
+                <span>Inicio</span>
+                <span class="dash-crumb__sep" data-icon="chevronRight"></span>
+                <span class="dash-crumb__active">Dashboard</span>
+              </nav>
+              <header class="dash-header">
+                <div class="dash-header__main">
+                  <h2 class="dash-header__title">Panel de cumplimiento</h2>
+                  <p class="dash-header__subtitle" id="dash-header-sub">Monitoreo de cumplimiento entre marcos y vectores de riesgo.</p>
+                  <div class="dash-header__meta">
+                    <span class="dash-status" id="dash-conn-status">
+                      <span class="dash-status__dot"></span>
+                      <span id="dash-conn-label">Motor de cumplimiento activo</span>
+                    </span>
+                    <span class="dash-header__sep" aria-hidden="true">·</span>
+                    <span class="dash-header__time" id="dash-last-update">Última actualización: —</span>
+                  </div>
+                </div>
+                <div class="dash-header__actions">
+                  <button type="button" class="ws-btn ws-btn--filter" id="dash-btn-filter">
+                    <span data-icon="filter"></span><span id="dash-filter-btn-label">Filtros</span>
+                  </button>
+                  <button type="button" class="ws-btn" id="dash-btn-export">
+                    <span data-icon="download"></span><span>Exportar</span>
+                  </button>
+                </div>
+              </header>
+
+              <div class="dash-filters-bar" id="dash-filters-bar" hidden>
+                <span class="dash-filters-bar__label">Filtros activos:</span>
+                <div class="dash-filter-chips" id="dash-filter-chips"></div>
+                <button type="button" class="link-btn" id="dash-clear-filters">Limpiar todo</button>
+              </div>
+
+              <div class="bento-grid dash-kpi-row">
+                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface drill-target" id="kpi-fw-card" role="button" tabindex="0" title="Ver controles del marco seleccionado">
+                  <div class="dash-kpi__head">
+                    <span class="dash-kpi__label" id="kpi-fw-label">Cumplimiento ISO 27001</span>
+                    <span class="dash-kpi__icon" data-icon="verified"></span>
+                  </div>
+                  <div class="dash-kpi__value-row">
+                    <span class="dash-kpi__value" id="kpi-fw-pct">—</span>
+                    <span class="dash-kpi__delta dash-kpi__delta--down" id="kpi-fw-delta" hidden>
+                      <span data-icon="warning"></span><span>—</span>
+                    </span>
+                  </div>
+                  <div class="dash-kpi__track"><span id="kpi-fw-bar" style="width:0"></span></div>
+                  <p class="dash-kpi__hint" id="kpi-fw-target">Objetivo: 95% de madurez · Clic para detalle</p>
+                </div>
+                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface drill-target drill-target--risk" id="kpi-risk-card" role="button" tabindex="0" title="Ver listado técnico de hallazgos críticos">
+                  <div class="dash-kpi__risk">
+                    <div class="dash-kpi__ring" id="kpi-risk-ring"></div>
+                    <div>
+                      <span class="dash-kpi__label">Vulnerabilidades críticas</span>
+                      <span class="dash-kpi__value dash-kpi__value--risk" id="kpi-risk-count">—</span>
+                      <p class="dash-kpi__hint" id="kpi-risk-sub">Clic para mitigar · listado técnico</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface">
+                  <div class="dash-kpi__head">
+                    <span class="dash-kpi__label">Auditorías activas</span>
+                    <span class="dash-kpi__icon" data-icon="pending"></span>
+                  </div>
+                  <ul class="dash-audit-list" id="kpi-audit-list"></ul>
+                </div>
+              </div>
+
+              <div class="bento-grid">
+                <div class="glass-box dash-card bento-span-4 risk-index-card drill-target" id="risk-index-card" role="button" tabindex="0" title="Ver incidencias críticas">
+                  <div class="card-head card-head--tight">
+                    <span class="card-head__title card-head__title--caps">Índice de exposición al riesgo</span>
+                    <span class="grade-chip" id="score-grade">—</span>
+                  </div>
+                  <div class="risk-index__body">
+                    <div class="score-donut score-donut--center" id="score-donut"></div>
+                    <p class="risk-index__risk" id="risk-label">Riesgo moderado</p>
+                  </div>
+                  <div class="risk-index__foot">
+                    <div class="risk-index__stat">
+                      <span class="risk-index__stat-lbl">Cumplimiento</span>
+                      <span class="risk-index__stat-val" id="risk-compliance-pct">0%</span>
+                    </div>
+                    <div class="risk-index__stat drill-target drill-target--inline" id="risk-incidents-stat" role="button" tabindex="0" title="Listado de controles críticos">
+                      <span class="risk-index__stat-lbl">Incidencias</span>
+                      <span class="risk-index__stat-val risk-index__stat-val--bad" id="risk-incidents">0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="glass-box dash-card bento-span-8 maturity-card">
+                  <div class="card-head card-head--tight">
+                    <span class="card-head__title card-head__title--caps">Matriz global de madurez</span>
+                    <span class="live-chip">Datos en vivo</span>
+                  </div>
+                  <div class="maturity-list" id="maturity-list"></div>
+                </div>
+
+                <div class="glass-box dash-card bento-span-12 controls-table-card filtered-table-card" id="filtered-table-card">
+                  <div class="card-head card-head--tight card-head--table">
+                    <span class="card-head__title card-head__title--caps" id="filtered-table-title">Estado de controles filtrados</span>
+                    <span class="filtered-table__legend"><i class="cell-crit"></i> Crítico / Alto · Clic en fila para mitigar</span>
+                  </div>
+                  <div class="gaps-table-wrap grid-table-wrap">
+                    <table class="data-table data-table--enterprise data-table--filtered" id="filtered-controls-table">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Dominio</th>
+                          <th>Riesgo</th>
+                          <th>Madurez</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody id="filtered-controls-body"></tbody>
+                    </table>
+                  </div>
+                  <div class="filtered-table__foot" id="filtered-table-foot" hidden>
+                    <button type="button" class="link-btn" id="filtered-show-more">Ver más resultados</button>
+                  </div>
+                </div>
+
+                <div class="glass-box dash-card bento-span-12 controls-table-card" hidden aria-hidden="true">
+                  <div class="card-head card-head--tight card-head--table">
+                    <span class="card-head__title card-head__title--caps">Estado de controles críticos</span>
+                    <button type="button" class="link-btn" data-goto-gaps>Ver todas las evaluaciones</button>
+                  </div>
+                  <div class="gaps-table-wrap grid-table-wrap">
+                    <table class="data-table data-table--enterprise" id="critical-gaps-table">
+                      <thead>
+                        <tr>
+                          <th>Marco</th>
+                          <th>Dominio</th>
+                          <th>Control</th>
+                          <th>Madurez</th>
+                          <th>Estado</th>
+                          <th class="cell-action"></th>
+                        </tr>
+                      </thead>
+                      <tbody id="critical-gaps-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="glass-box dash-card bento-span-12 stream-card">
+                  <div class="card-head card-head--tight">
+                    <span class="card-head__title card-head__title--caps">Flujo de cumplimiento reciente</span>
+                  </div>
+                  <ul class="stream-list" id="activity-list"></ul>
+                </div>
+              </div>
+
+              <div class="ai-exec-grid">
+                <div class="glass-box ai-summary-card">
+                  <div class="card-head">
+                    <span class="card-head__title">
+                      <span class="ai-spark" data-icon="ai"></span>Resumen ejecutivo IA
+                    </span>
+                    <span class="live-chip" id="ai-summary-state">Listo</span>
+                  </div>
+                  <div class="ai-summary__body" id="ai-summary-body">
+                    <p class="ai-summary__placeholder">Genera un análisis ejecutivo del estado de gobernanza con tu modelo Ollama configurado. Son sugerencias de la IA basadas en tus evaluaciones.</p>
+                  </div>
+                  <div class="ai-summary__foot">
+                    <button type="button" class="ws-btn primary" id="btn-ai-summary">
+                      <span data-icon="ai"></span><span>Generar análisis</span>
+                    </button>
+                    <button type="button" class="ws-btn" id="btn-ai-regen" hidden>
+                      <span data-icon="refresh"></span><span>Regenerar análisis</span>
+                    </button>
+                    <button type="button" class="ws-btn" id="btn-ai-copy" hidden>
+                      <span data-icon="copy"></span><span>Copiar</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="glass-box health-card">
+                  <div class="health-card__label">Estado de salud global</div>
+                  <div class="health-card__grade" id="health-grade">—</div>
+                  <div class="health-card__status">
+                    <span class="health-card__badge" id="health-status">Estable</span>
+                  </div>
+                  <div class="health-card__trend" id="health-trend">
+                    <span data-icon="trend"></span><span id="health-trend-text">Madurez media en seguimiento</span>
+                  </div>
+                  <div class="health-card__ring" id="health-ring"></div>
+                </div>
+              </div>
+
+              <div class="norvik-grid norvik-grid--mid dash-secondary">
+                <div class="glass-box dash-card remediation-card">
+                  <div class="card-head card-head--tight">
+                    <span class="card-head__title card-head__title--caps">Progreso del plan de remediación</span>
+                    <span class="card-head__hint" id="remediation-hint"></span>
+                  </div>
+                  <div class="remediation-list" id="remediation-list"></div>
+                </div>
+                <div class="glass-box dash-card gapmatrix-card">
+                  <div class="card-head card-head--tight">
+                    <span class="card-head__title card-head__title--caps">Mapa de brechas — Dominio × Marco</span>
+                    <span class="matrix-legend">
+                      <span><i class="cell-crit"></i>Crítico</span>
+                      <span><i class="cell-part"></i>Parcial</span>
+                      <span><i class="cell-ok"></i>Alineado</span>
+                    </span>
+                  </div>
+                  <div class="gapmatrix-wrap grid-table-wrap" id="gap-matrix"></div>
+                </div>
+              </div>
+              </div>
+            </div>
+
+            <div class="norvik-panel" data-panel="nist" id="panel-nist"></div>
+            <div class="norvik-panel" data-panel="iso" id="panel-iso"></div>
+            <div class="norvik-panel" data-panel="cis" id="panel-cis"></div>
+            <div class="norvik-panel" data-panel="rgpd" id="panel-rgpd"></div>
+
+            <div class="norvik-panel" data-panel="reports">
+              <div id="reports-content" class="reports-page">
+                <header class="reports-header">
+                  <div>
+                    <h2 class="reports-header__title">Informes y análisis de brechas</h2>
+                    <p class="reports-header__sub" id="rpt-period">Revisión de cumplimiento · —</p>
+                  </div>
+                  <div class="reports-header__actions">
+                    <button type="button" class="ws-btn" id="btn-export-panel" disabled title="Próximamente">
+                      <span data-icon="export"></span><span>Exportar Excel</span>
+                    </button>
+                    <button type="button" class="ws-btn primary" id="btn-export-rpt">
+                      <span data-icon="doc"></span><span>Generar informe PDF</span>
+                    </button>
+                  </div>
+                </header>
+                <p id="report-result" class="report-export__result"></p>
+
+                <div class="bento-grid reports-bento">
+                  <div class="glass-box dash-card bento-span-7 rpt-ai-card">
+                    <div class="card-head">
+                      <span class="card-head__title">
+                        <span class="ai-spark" data-icon="ai"></span>Resumen ejecutivo IA
+                      </span>
+                      <span class="live-chip" id="rpt-ai-summary-state">Listo</span>
+                    </div>
+                    <div class="ai-summary__body" id="rpt-ai-summary-body">
+                      <p class="ai-summary__placeholder">Genera un análisis ejecutivo del estado de gobernanza con Ollama. Las sugerencias se basan en tus evaluaciones actuales.</p>
+                    </div>
+                    <div class="ai-summary__foot">
+                      <button type="button" class="ws-btn primary" id="rpt-btn-ai-summary">
+                        <span data-icon="ai"></span><span>Generar análisis</span>
+                      </button>
+                      <button type="button" class="ws-btn" id="rpt-btn-ai-regen" hidden>
+                        <span data-icon="refresh"></span><span>Regenerar</span>
+                      </button>
+                      <button type="button" class="ws-btn" id="rpt-btn-ai-copy" hidden>
+                        <span data-icon="copy"></span><span>Copiar</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="glass-box dash-card bento-span-5 health-card health-card--brand">
+                    <div class="health-card__label">Estado de salud global</div>
+                    <div class="health-card__grade" id="rpt-health-grade">—</div>
+                    <div class="health-card__status">
+                      <span class="health-card__badge" id="rpt-health-status">Estable</span>
+                    </div>
+                    <div class="health-card__trend" id="rpt-health-trend">
+                      <span data-icon="trend"></span><span id="rpt-health-trend-text">Madurez media en seguimiento</span>
+                    </div>
+                    <div class="health-card__ring" id="rpt-health-ring"></div>
+                    <div class="health-card__watermark" aria-hidden="true">
+                      <img src="norvik-logo.png" alt="" width="100" height="auto" />
+                    </div>
+                  </div>
+
+                  <div class="glass-box dash-card bento-span-12 gapmatrix-card">
+                    <div class="card-head card-head--tight">
+                      <span class="card-head__title card-head__title--caps">Mapa de brechas — Dominio × Marco</span>
+                      <span class="matrix-legend">
+                        <span><i class="cell-crit"></i>Crítico</span>
+                        <span><i class="cell-part"></i>Parcial</span>
+                        <span><i class="cell-ok"></i>Alineado</span>
+                      </span>
+                    </div>
+                    <div class="gapmatrix-wrap grid-table-wrap" id="rpt-gap-matrix"></div>
+                  </div>
+
+                  <div class="glass-box dash-card bento-span-8 remediation-card">
+                    <div class="card-head card-head--tight">
+                      <span class="card-head__title card-head__title--caps">Progreso del plan de remediación</span>
+                      <span class="card-head__hint" id="rpt-remediation-hint"></span>
+                    </div>
+                    <div class="remediation-list" id="rpt-remediation-list"></div>
+                  </div>
+
+                  <div class="glass-box dash-card bento-span-4 upload-card rpt-archive">
+                    <div class="card-head card-head--tight">
+                      <span class="card-head__title card-head__title--caps">Biblioteca de evidencias</span>
+                    </div>
+                    <div class="dropzone dropzone--compact" id="dropzone" role="button" tabindex="0" aria-label="Subir evidencias">
+                      <div class="dropzone__circle"><span data-icon="upload"></span></div>
+                      <div class="dropzone__title">Arrastra archivos aquí</div>
+                      <p class="dropzone__hint">PDF, imágenes y documentos vinculados a controles.</p>
+                      <input type="file" id="evidence-input" multiple hidden />
+                    </div>
+                    <ul class="upload-list" id="upload-list"></ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="norvik-panel" data-panel="ai">
+              <div class="glass-box ai-chat">
+                <div class="glass-box__title">Asistente IA — Recomendaciones GRC</div>
+                <div id="ai-offline" class="ai-offline" hidden>
+                  Ollama no está disponible. Inicia Ollama en http://localhost:11434 para habilitar recomendaciones.
+                </div>
+                <div class="ai-messages" id="ai-messages">
+                  <div class="ai-msg bot">Selecciona un gap del dashboard o describe un control para recibir recomendaciones técnicas en español.</div>
+                </div>
+                <div class="ai-input-row">
+                  <input type="text" class="ai-input" id="ai-input" placeholder="Describe un gap o control..." />
+                  <button type="button" class="ws-btn primary" id="ai-send">
+                    <span data-icon="send"></span><span>Enviar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="norvik-panel" data-panel="settings">
+              <div class="glass-box">
+                <h1 style="font-size:22px;font-weight:650;letter-spacing:-.02em;margin-bottom:4px">Configuración</h1>
+                <p class="sub" style="color:var(--ink-3);font-size:13px;margin-bottom:18px">Conexión IA, apariencia y preferencias de Norvik.</p>
+
+                <div class="settings-section" id="ollama-settings">
+                  <div class="label">Asistente IA (Ollama)</div>
+                  <div class="settings-grid settings-grid--ollama">
+                    <div class="setting-field">
+                      <label for="set-ollama-provider">Proveedor</label>
+                      <select id="set-ollama-provider" class="setting-select">
+                        <option value="local">Ollama local</option>
+                        <option value="cloud">Ollama Cloud (API)</option>
+                      </select>
+                    </div>
+                    <div class="setting-field" id="field-ollama-host">
+                      <label for="set-ollama-host">URL local</label>
+                      <input type="text" id="set-ollama-host" placeholder="http://localhost:11434" />
+                    </div>
+                    <div class="setting-field" id="field-ollama-cloud-key" hidden>
+                      <label for="set-ollama-cloud-key">API Key Cloud</label>
+                      <input type="password" id="set-ollama-cloud-key" placeholder="ollama_..." autocomplete="off" />
+                      <p class="setting-hint">Obtén tu clave en <a href="https://ollama.com/settings/keys" target="_blank" rel="noopener">ollama.com/settings/keys</a>. La API usa <code>https://ollama.com/api</code>.</p>
+                    </div>
+                    <div class="setting-field">
+                      <label for="set-ollama-model">Modelo</label>
+                      <select id="set-ollama-model" class="setting-select"></select>
+                      <p class="setting-hint" id="ollama-models-hint" hidden></p>
+                      <p class="setting-hint">Local: solo modelos descargados (<code>ollama pull llama3.2</code>). Cloud: catálogo de ollama.com (Llama no incluido).</p>
+                    </div>
+                    <div class="setting-field setting-field--wide">
+                      <label for="set-ollama-model-custom">Modelo personalizado (opcional)</label>
+                      <input type="text" id="set-ollama-model-custom" placeholder="Ej. llama3.1:8b" />
+                    </div>
+                  </div>
+                  <div class="setting-field setting-field--wide">
+                    <label for="set-ai-prompt">Rol del asistente (system prompt)</label>
+                    <textarea id="set-ai-prompt" class="setting-textarea" rows="5" placeholder="Vacío = rol GRC Norvik (auditoría, informes, decisiones, sugerencias)"></textarea>
+                  </div>
+                  <div class="ollama-actions">
+                    <button type="button" class="ws-btn" id="btn-test-ollama">
+                      <span data-icon="sync"></span><span>Probar conexión</span>
+                    </button>
+                    <button type="button" class="ws-btn" id="btn-load-models">
+                      <span data-icon="ai"></span><span>Cargar modelos</span>
+                    </button>
+                    <span class="ollama-test-status" id="ollama-test-status"></span>
+                  </div>
+                </div>
+
+                <div class="settings-section" id="theme-settings-panel"></div>
+
+                <div class="settings-section">
+                  <div class="label">Organización</div>
+                  <div class="settings-grid">
+                    <div class="setting-field">
+                      <label for="set-org">Nombre</label>
+                      <input type="text" id="set-org" />
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:16px">
+                  <button type="button" class="ws-btn primary" id="btn-save-settings">
+                    <span data-icon="check"></span><span>Guardar configuración</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-backdrop" id="filter-backdrop" hidden></div>
+  <aside class="filter-drawer" id="filter-drawer" aria-label="Filtros del dashboard" hidden>
+    <div class="filter-drawer__head">
+      <div>
+        <h2 class="filter-drawer__title">Filtros</h2>
+        <p class="filter-drawer__sub">Refina el espacio de cumplimiento</p>
+      </div>
+      <button type="button" class="icon-btn" id="filter-drawer-close" aria-label="Cerrar filtros"><span data-icon="close"></span></button>
+    </div>
+    <div class="filter-drawer__body">
+      <div class="filter-section">
+        <span class="filter-section__label">Marco normativo</span>
+        <div class="filter-fw-list" id="filter-fw-list"></div>
+      </div>
+      <div class="filter-section">
+        <span class="filter-section__label">Nivel de riesgo</span>
+        <div class="filter-risk-grid" id="filter-risk-grid">
+          <button type="button" class="filter-risk is-active" data-risk="critical">Crítico</button>
+          <button type="button" class="filter-risk is-active" data-risk="warning">Alto</button>
+          <button type="button" class="filter-risk" data-risk="info">Medio</button>
+          <button type="button" class="filter-risk" data-risk="ok">Bajo</button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <span class="filter-section__label">Rango de fechas</span>
+        <div class="filter-date">
+          <button type="button" class="filter-date__main" id="filter-date-label">Últimos 90 días</button>
+          <div class="filter-date__quick">
+            <button type="button" class="filter-date-chip" data-days="1">Hoy</button>
+            <button type="button" class="filter-date-chip" data-days="7">7 días</button>
+            <button type="button" class="filter-date-chip" data-days="30">30 días</button>
+            <button type="button" class="filter-date-chip is-active" data-days="90">90 días</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-section">
+        <label class="filter-section__label" for="filter-unit">Unidad de negocio</label>
+        <select class="setting-select" id="filter-unit">
+          <option value="all">Todas las unidades</option>
+          <option value="it">Tecnología</option>
+          <option value="legal">Legal y cumplimiento</option>
+          <option value="ops">Operaciones</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-drawer__foot">
+      <button type="button" class="ws-btn primary" id="filter-apply">Aplicar filtros</button>
+      <button type="button" class="ws-btn" id="filter-reset">Restablecer</button>
+    </div>
+  </aside>
+
+  <div class="filter-backdrop" id="drill-backdrop" hidden></div>
+  <aside class="filter-drawer drill-drawer" id="drill-drawer" aria-label="Detalle técnico de hallazgos" hidden>
+    <div class="filter-drawer__head">
+      <div>
+        <nav class="drill-crumb" aria-label="Ruta de drill-down">
+          <span>Dashboard</span>
+          <span class="drill-crumb__sep" data-icon="chevronRight"></span>
+          <span id="drill-crumb-metric">Hallazgos</span>
+        </nav>
+        <h2 class="filter-drawer__title" id="drill-drawer-title">Listado técnico</h2>
+        <p class="filter-drawer__sub" id="drill-drawer-sub">Selecciona un ítem para ir al control y mitigar</p>
+      </div>
+      <button type="button" class="icon-btn" id="drill-drawer-close" aria-label="Cerrar detalle"><span data-icon="close"></span></button>
+    </div>
+    <div class="drill-drawer__summary">
+      <span class="drill-count-badge" id="drill-count-badge">0</span>
+      <span class="drill-summary-text" id="drill-summary-text">elementos afectados</span>
+    </div>
+    <div class="filter-drawer__body drill-drawer__body">
+      <div class="gaps-table-wrap grid-table-wrap drill-table-wrap">
+        <table class="data-table data-table--enterprise data-table--drill">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Control / dominio</th>
+              <th>Riesgo</th>
+              <th>Madurez</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="drill-drawer-body"></tbody>
+        </table>
+      </div>
+      <p class="drill-empty" id="drill-empty" hidden>Sin hallazgos en este criterio.</p>
+    </div>
+    <div class="filter-drawer__foot drill-drawer__foot">
+      <button type="button" class="ws-btn" id="drill-scroll-table">
+        <span data-icon="filter"></span><span>Ver en tabla filtrada</span>
+      </button>
+      <button type="button" class="ws-btn primary" id="drill-ai-first" hidden>
+        <span data-icon="ai"></span><span>Mitigar el primero con IA</span>
+      </button>
+    </div>
+  </aside>
+
+  <button type="button" class="dash-fab" id="dash-fab" title="Nuevo recurso" hidden>
+    <span data-icon="add"></span>
+    <span class="dash-fab__tip">Nuevo recurso</span>
+  </button>
+
+  <div class="modal-overlay profile-modal-overlay" id="user-profile-modal" hidden>
+    <div class="modal-card glass-panel user-profile-card">
+      <div class="modal-card__head">
+        <div>
+          <span class="card-head__title"><img class="modal-brand-logo" src="norvik-logo.png" width="88" height="26" alt="" /> Mi perfil</span>
+          <p class="profile-modal__sub">Identidad profesional para Norvik, informes PDF y asistente IA</p>
+        </div>
+        <button type="button" class="icon-btn" id="profile-close" aria-label="Cerrar"><span data-icon="close"></span></button>
+      </div>
+      <div class="modal-card__body profile-modal__body">
+        <section class="profile-section profile-section--hero">
+          <div class="profile-avatar-block">
+            <button type="button" class="profile-avatar-picker" id="profile-avatar-picker" aria-label="Cambiar foto de perfil">
+              <img class="profile-avatar-picker__img" id="profile-avatar-preview" alt="" hidden />
+              <span class="profile-avatar-picker__initials" id="profile-avatar-initials">NV</span>
+              <span class="profile-avatar-picker__overlay"><span data-icon="upload"></span></span>
+            </button>
+            <input type="file" id="profile-avatar-input" accept="image/png,image/jpeg,image/webp" hidden />
+            <div class="profile-avatar-meta">
+              <strong>Foto de perfil</strong>
+              <span>PNG, JPG o WebP · máx. 2 MB</span>
+              <div class="profile-avatar-actions">
+                <button type="button" class="ws-btn" id="profile-avatar-upload">
+                  <span data-icon="upload"></span><span>Subir foto</span>
+                </button>
+                <button type="button" class="ws-btn" id="profile-avatar-remove" hidden>
+                  <span data-icon="close"></span><span>Quitar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-section">
+          <h3 class="profile-section__title">Identidad <span class="profile-required">Obligatorio</span></h3>
+          <div class="profile-grid">
+            <div class="setting-field">
+              <label for="profile-user-name">Nombre completo <span class="req">*</span></label>
+              <input type="text" id="profile-user-name" placeholder="Ej. Ana García" autocomplete="name" required />
+            </div>
+            <div class="setting-field">
+              <label for="profile-user-role">Rol / cargo <span class="req">*</span></label>
+              <input type="text" id="profile-user-role" placeholder="Ej. CISO · Auditor de cumplimiento" autocomplete="organization-title" required />
+            </div>
+            <div class="setting-field setting-field--wide">
+              <label for="profile-bio">Acerca de ti</label>
+              <textarea id="profile-bio" class="setting-textarea" rows="3" placeholder="Breve descripción profesional (opcional)"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-section">
+          <h3 class="profile-section__title">Organización</h3>
+          <div class="profile-grid">
+            <div class="setting-field setting-field--wide">
+              <label for="profile-org">Empresa / entidad</label>
+              <input type="text" id="profile-org" placeholder="Nombre de la organización" autocomplete="organization" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-department">Departamento / área</label>
+              <input type="text" id="profile-department" placeholder="Ej. Riesgos y cumplimiento" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-edition">Edición Norvik</label>
+              <input type="text" id="profile-edition" placeholder="Enterprise Edition" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-next-audit">Próxima auditoría</label>
+              <input type="text" id="profile-next-audit" placeholder="DD/MM/AAAA" />
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-section">
+          <h3 class="profile-section__title">Contacto <span class="profile-optional">Opcional</span></h3>
+          <div class="profile-grid">
+            <div class="setting-field">
+              <label for="profile-email">Correo electrónico</label>
+              <input type="email" id="profile-email" placeholder="nombre@empresa.com" autocomplete="email" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-phone">Teléfono</label>
+              <input type="tel" id="profile-phone" placeholder="+34 600 000 000" autocomplete="tel" />
+            </div>
+            <div class="setting-field setting-field--wide">
+              <label for="profile-location">Ubicación / oficina</label>
+              <input type="text" id="profile-location" placeholder="Ciudad, país o sede" autocomplete="address-level2" />
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-section">
+          <h3 class="profile-section__title">Redes y presencia web <span class="profile-optional">Opcional</span></h3>
+          <div class="profile-grid">
+            <div class="setting-field">
+              <label for="profile-linkedin">LinkedIn</label>
+              <input type="url" id="profile-linkedin" placeholder="https://linkedin.com/in/usuario" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-github">GitHub</label>
+              <input type="url" id="profile-github" placeholder="https://github.com/usuario" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-twitter">X (Twitter)</label>
+              <input type="url" id="profile-twitter" placeholder="https://x.com/usuario" />
+            </div>
+            <div class="setting-field">
+              <label for="profile-website">Sitio web</label>
+              <input type="url" id="profile-website" placeholder="https://tu-dominio.com" />
+            </div>
+          </div>
+        </section>
+
+        <p class="profile-footnote"><span class="req">*</span> Nombre y cargo son obligatorios. El resto enriquece informes y el contexto del asistente IA.</p>
+        <div class="profile-actions">
+          <button type="button" class="ws-btn" id="profile-cancel">Cancelar</button>
+          <button type="button" class="ws-btn primary" id="profile-save">
+            <span data-icon="check"></span><span>Guardar perfil</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="support-modal" hidden>
+    <div class="modal-card glass-panel">
+      <div class="modal-card__head">
+        <span class="card-head__title"><span class="ai-spark" data-icon="help"></span>Soporte</span>
+        <button type="button" class="icon-btn" id="support-close" aria-label="Cerrar"><span data-icon="close"></span></button>
+      </div>
+      <div class="modal-card__body">
+        <p>Norvik es tu plataforma de gobernanza, riesgo y cumplimiento (GRC) para NIST CSF 2.0, ISO 27001, CIS Controls v8 y RGPD.</p>
+        <ul class="support-list">
+          <li><strong>Evaluar madurez:</strong> abre un marco en el menú y asigna nivel CMM (L0–L5) a cada control.</li>
+          <li><strong>Dashboard:</strong> revisa score global, brechas críticas y el mapa de brechas Dominio × Marco.</li>
+          <li><strong>Asistente IA:</strong> configura Ollama en Configuración para recibir recomendaciones.</li>
+          <li><strong>Informes:</strong> genera el PDF ejecutivo desde la sección Informes.</li>
+        </ul>
+        <p class="support-meta">Norvik · Enterprise Edition · v1.0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span class="dot"></span><span id="toast-text"></span></div>
+  <script src="loader.js"></script>
+  <script src="icons.js"></script>
+  <script src="theme-engine.js"></script>
+  <script src="motion.js"></script>
+  <script src="responsive.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

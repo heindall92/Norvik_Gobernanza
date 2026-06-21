@@ -1,0 +1,644 @@
+{
+  "code": "NIST_CSF2",
+  "name": "NIST CSF 2.0",
+  "version": "2.0",
+  "controls": [
+    {
+      "domain": "Govern",
+      "control_id": "GV.OC-01",
+      "title": "Contexto organizacional",
+      "description": "La misión de la organización se entiende y comunica.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.OC-02",
+      "title": "Partes interesadas internas",
+      "description": "Las partes interesadas internas se entienden y sus expectativas respecto a la ciberseguridad se determinan.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.OC-03",
+      "title": "Partes interesadas externas",
+      "description": "Las partes interesadas externas y sus expectativas se determinan.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.OC-04",
+      "title": "Requisitos legales",
+      "description": "Se identifican y comunican los requisitos legales, regulatorios y contractuales.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.OC-05",
+      "title": "Objetivos de ciberseguridad",
+      "description": "Los objetivos de ciberseguridad se establecen y acuerdan con las partes interesadas.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.RM-01",
+      "title": "Objetivos de gestión de riesgos",
+      "description": "Se establecen objetivos de gestión de riesgos de ciberseguridad.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.RM-02",
+      "title": "Apetito de riesgo",
+      "description": "Se establece y comunica el apetito y tolerancia al riesgo.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.RM-03",
+      "title": "Priorización de riesgos",
+      "description": "Las actividades de gestión de riesgos se priorizan.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.RR-01",
+      "title": "Roles de ciberseguridad",
+      "description": "Se establecen roles, responsabilidades y autoridades de ciberseguridad.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.RR-02",
+      "title": "Accountability",
+      "description": "Se establece accountability para las decisiones de ciberseguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.PO-01",
+      "title": "Política de ciberseguridad",
+      "description": "Existe una política de ciberseguridad establecida y comunicada.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.PO-02",
+      "title": "Revisión de política",
+      "description": "La política se revisa y actualiza periódicamente.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.OV-01",
+      "title": "Supervisión de resultados",
+      "description": "Se supervisa el desempeño de la estrategia de ciberseguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.OV-02",
+      "title": "Mejora continua",
+      "description": "Se revisa y ajusta la estrategia de ciberseguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.SC-01",
+      "title": "Cadena de suministro",
+      "description": "Se establece una estrategia de gestión de riesgos de la cadena de suministro.",
+      "weight": 3
+    },
+    {
+      "domain": "Govern",
+      "control_id": "GV.SC-02",
+      "title": "Roles en cadena de suministro",
+      "description": "Se definen roles y responsabilidades en la cadena de suministro.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-01",
+      "title": "Inventario de hardware",
+      "description": "Se mantiene un inventario de hardware autorizado.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-02",
+      "title": "Inventario de software",
+      "description": "Se mantiene un inventario de software autorizado.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-03",
+      "title": "Representación de comunicaciones",
+      "description": "Se documentan flujos de datos y comunicaciones.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-04",
+      "title": "Servicios externos",
+      "description": "Se catalogan servicios externos y sus dependencias.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-05",
+      "title": "Priorización de activos",
+      "description": "Los activos se priorizan según criticidad.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-07",
+      "title": "Inventario de datos",
+      "description": "Se mantiene inventario de datos y metadatos.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.AM-08",
+      "title": "Gestión del ciclo de vida",
+      "description": "Se gestiona el ciclo de vida de activos de hardware, software y datos.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-01",
+      "title": "Identificación de vulnerabilidades",
+      "description": "Se identifican vulnerabilidades en activos.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-02",
+      "title": "Inteligencia de amenazas",
+      "description": "Se recibe y analiza inteligencia de amenazas.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-03",
+      "title": "Identificación de amenazas internas",
+      "description": "Se identifican amenazas internas.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-04",
+      "title": "Impacto potencial",
+      "description": "Se identifican impactos potenciales de amenazas.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-05",
+      "title": "Evaluación de riesgos",
+      "description": "Se evalúan riesgos usando escenarios de amenaza.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-06",
+      "title": "Priorización de riesgos",
+      "description": "Los riesgos se priorizan y documentan.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-07",
+      "title": "Respuesta a riesgos",
+      "description": "Se seleccionan respuestas a riesgos identificados.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-08",
+      "title": "Proceso de gestión de riesgos",
+      "description": "Se establece un proceso de gestión de riesgos.",
+      "weight": 3
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-09",
+      "title": "Riesgos de cadena de suministro",
+      "description": "Se identifican riesgos de la cadena de suministro.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.RA-10",
+      "title": "Riesgos de terceros",
+      "description": "Se evalúan riesgos de proveedores y socios.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.IM-01",
+      "title": "Mejora de procesos",
+      "description": "Se mejoran procesos de identificación basados en lecciones aprendidas.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.IM-02",
+      "title": "Mejora de evaluación de riesgos",
+      "description": "Se mejora la evaluación de riesgos continuamente.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.IM-03",
+      "title": "Mejora de inventarios",
+      "description": "Se mejora la gestión de inventarios de activos.",
+      "weight": 2
+    },
+    {
+      "domain": "Identify",
+      "control_id": "ID.IM-04",
+      "title": "Mejora de respuesta a riesgos",
+      "description": "Se mejora la respuesta a riesgos identificados.",
+      "weight": 2
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AA-01",
+      "title": "Gestión de identidades",
+      "description": "Existen identidades gestionadas para personas, servicios y hardware.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AA-02",
+      "title": "Autenticación",
+      "description": "Se implementa autenticación de identidades.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AA-03",
+      "title": "Autenticación multifactor",
+      "description": "Se usa MFA para accesos privilegiados y remotos.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AA-04",
+      "title": "Gestión de credenciales",
+      "description": "Se gestionan credenciales de forma segura.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AA-05",
+      "title": "Control de acceso",
+      "description": "Se implementa control de acceso basado en roles.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AA-06",
+      "title": "Revisión de accesos",
+      "description": "Se revisan accesos periódicamente.",
+      "weight": 2
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AT-01",
+      "title": "Concienciación",
+      "description": "Existe programa de concienciación en ciberseguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.AT-02",
+      "title": "Formación especializada",
+      "description": "Personal con roles especializados recibe formación.",
+      "weight": 2
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.DS-01",
+      "title": "Protección de datos en reposo",
+      "description": "Los datos en reposo están protegidos.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.DS-02",
+      "title": "Protección de datos en tránsito",
+      "description": "Los datos en tránsito están protegidos.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.DS-10",
+      "title": "Cifrado",
+      "description": "Se usa cifrado según política.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.DS-11",
+      "title": "Copias de seguridad",
+      "description": "Existen copias de seguridad y se prueban.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.PS-01",
+      "title": "Gestión de configuración",
+      "description": "Se gestionan configuraciones de sistemas.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.PS-02",
+      "title": "Hardening",
+      "description": "Se aplican configuraciones seguras (hardening).",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.PS-03",
+      "title": "Gestión de parches",
+      "description": "Se gestionan parches de seguridad.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.PS-04",
+      "title": "Registro y auditoría",
+      "description": "Se registran eventos de seguridad.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.PS-05",
+      "title": "Protección de logs",
+      "description": "Los registros están protegidos contra alteración.",
+      "weight": 2
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.PS-06",
+      "title": "Desarrollo seguro",
+      "description": "Se integra seguridad en el ciclo de desarrollo.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.IR-01",
+      "title": "Plan de respuesta",
+      "description": "Existe plan de respuesta a incidentes.",
+      "weight": 3
+    },
+    {
+      "domain": "Protect",
+      "control_id": "PR.IR-02",
+      "title": "Comunicación de incidentes",
+      "description": "Se establecen canales de comunicación para incidentes.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-01",
+      "title": "Baseline de red",
+      "description": "Se establece baseline de actividad de red.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-02",
+      "title": "Análisis de eventos",
+      "description": "Se analizan eventos detectados.",
+      "weight": 3
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-03",
+      "title": "Correlación de eventos",
+      "description": "Se correlacionan eventos de múltiples fuentes.",
+      "weight": 3
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-04",
+      "title": "Impacto de eventos",
+      "description": "Se determina el impacto de eventos detectados.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-06",
+      "title": "Información de detección",
+      "description": "Se proporciona información de detección a partes relevantes.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-07",
+      "title": "Inteligencia de detección",
+      "description": "Se integra inteligencia de amenazas en detección.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.AE-08",
+      "title": "Detección de anomalías",
+      "description": "Se detectan anomalías en actividad.",
+      "weight": 3
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.CM-01",
+      "title": "Monitoreo de red",
+      "description": "Se monitorea la red para detectar eventos.",
+      "weight": 3
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.CM-02",
+      "title": "Monitoreo de entorno físico",
+      "description": "Se monitorea el entorno físico.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.CM-03",
+      "title": "Monitoreo de personal",
+      "description": "Se monitorea actividad de usuarios según política.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.CM-06",
+      "title": "Monitoreo externo",
+      "description": "Se monitorea presencia externa de la organización.",
+      "weight": 2
+    },
+    {
+      "domain": "Detect",
+      "control_id": "DE.CM-09",
+      "title": "Detección de malware",
+      "description": "Se detecta código malicioso.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.MA-01",
+      "title": "Plan de respuesta ejecutado",
+      "description": "Se ejecuta el plan de respuesta a incidentes.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.MA-02",
+      "title": "Coordinación de respuesta",
+      "description": "Se coordina respuesta entre equipos.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.MA-03",
+      "title": "Análisis forense",
+      "description": "Se realiza análisis forense cuando procede.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.MA-04",
+      "title": "Mitigación de incidentes",
+      "description": "Se mitigan incidentes activos.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.MA-05",
+      "title": "Comunicación externa",
+      "description": "Se comunica con partes externas durante incidentes.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.AN-01",
+      "title": "Notificaciones",
+      "description": "Se realizan notificaciones requeridas.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.AN-02",
+      "title": "Análisis de impacto",
+      "description": "Se analiza el impacto del incidente.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.AN-03",
+      "title": "Análisis de causa raíz",
+      "description": "Se determina la causa raíz del incidente.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.AN-06",
+      "title": "Acciones post-incidente",
+      "description": "Se definen acciones tras el incidente.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.AN-07",
+      "title": "Lecciones aprendidas",
+      "description": "Se documentan lecciones aprendidas.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.AN-08",
+      "title": "Evidencia de incidentes",
+      "description": "Se preserva evidencia del incidente.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.CO-02",
+      "title": "Comunicación interna",
+      "description": "Se coordina comunicación interna durante incidentes.",
+      "weight": 2
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.CO-03",
+      "title": "Comunicación con autoridades",
+      "description": "Se comunica con autoridades cuando es requerido.",
+      "weight": 3
+    },
+    {
+      "domain": "Respond",
+      "control_id": "RS.MI-01",
+      "title": "Mejora de respuesta",
+      "description": "Se mejora el plan de respuesta continuamente.",
+      "weight": 2
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.RP-01",
+      "title": "Plan de recuperación",
+      "description": "Existe plan de recuperación ejecutado.",
+      "weight": 3
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.RP-02",
+      "title": "Priorización de recuperación",
+      "description": "Se priorizan activos para recuperación.",
+      "weight": 2
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.RP-03",
+      "title": "Restauración de sistemas",
+      "description": "Se restauran sistemas afectados.",
+      "weight": 3
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.RP-04",
+      "title": "Verificación post-recuperación",
+      "description": "Se verifica integridad tras recuperación.",
+      "weight": 2
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.RP-05",
+      "title": "Comunicación de recuperación",
+      "description": "Se comunica estado de recuperación.",
+      "weight": 2
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.RP-06",
+      "title": "Criterios de finalización",
+      "description": "Se definen criterios de finalización de recuperación.",
+      "weight": 2
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.CO-03",
+      "title": "Comunicación post-recuperación",
+      "description": "Se comunica con partes interesadas tras recuperación.",
+      "weight": 2
+    },
+    {
+      "domain": "Recover",
+      "control_id": "RC.CO-04",
+      "title": "Reputación pública",
+      "description": "Se gestiona reputación tras incidente mayor.",
+      "weight": 2
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "code": "RGPD",
+  "name": "RGPD",
+  "version": "2016/679",
+  "controls": [
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.1",
+      "title": "Licitud del tratamiento",
+      "description": "¿Existe base legal documentada para cada tratamiento de datos?",
+      "weight": 3
+    },
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.2",
+      "title": "Limitación de finalidad",
+      "description": "¿Los datos se recogen para fines determinados y legítimos?",
+      "weight": 3
+    },
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.3",
+      "title": "Minimización de datos",
+      "description": "¿Solo se recogen datos adecuados y necesarios?",
+      "weight": 3
+    },
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.4",
+      "title": "Exactitud",
+      "description": "¿Existen procedimientos para mantener datos exactos y actualizados?",
+      "weight": 2
+    },
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.5",
+      "title": "Limitación del plazo",
+      "description": "¿Se definen plazos de conservación y se eliminan datos obsoletos?",
+      "weight": 3
+    },
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.6",
+      "title": "Integridad y confidencialidad",
+      "description": "¿Se garantiza seguridad adecuada de los datos personales?",
+      "weight": 3
+    },
+    {
+      "domain": "Principios",
+      "control_id": "RGPD-5.7",
+      "title": "Responsabilidad proactiva",
+      "description": "¿Se demuestra el cumplimiento de los principios (accountability)?",
+      "weight": 3
+    },
+    {
+      "domain": "Privacy by Design",
+      "control_id": "RGPD-25.1",
+      "title": "Privacidad desde el diseño",
+      "description": "¿Se integra la protección de datos desde el diseño de sistemas?",
+      "weight": 3
+    },
+    {
+      "domain": "Privacy by Design",
+      "control_id": "RGPD-25.2",
+      "title": "Privacidad por defecto",
+      "description": "¿La configuración por defecto garantiza mínima exposición de datos?",
+      "weight": 3
+    },
+    {
+      "domain": "Seguridad",
+      "control_id": "RGPD-32.1",
+      "title": "Medidas técnicas",
+      "description": "¿Existen medidas técnicas adecuadas (cifrado, pseudonimización)?",
+      "weight": 3
+    },
+    {
+      "domain": "Seguridad",
+      "control_id": "RGPD-32.2",
+      "title": "Medidas organizativas",
+      "description": "¿Existen medidas organizativas (políticas, formación, accesos)?",
+      "weight": 3
+    },
+    {
+      "domain": "Seguridad",
+      "control_id": "RGPD-32.3",
+      "title": "Evaluación periódica",
+      "description": "¿Se evalúan y actualizan las medidas de seguridad periódicamente?",
+      "weight": 2
+    },
+    {
+      "domain": "Seguridad",
+      "control_id": "RGPD-32.4",
+      "title": "Notificación de brechas",
+      "description": "¿Existe procedimiento de notificación de brechas en 72h?",
+      "weight": 3
+    },
+    {
+      "domain": "DPIA",
+      "control_id": "RGPD-35.1",
+      "title": "Evaluación de impacto",
+      "description": "¿Se realizan EIPD cuando el tratamiento entraña alto riesgo?",
+      "weight": 3
+    },
+    {
+      "domain": "DPIA",
+      "control_id": "RGPD-35.2",
+      "title": "Consulta previa",
+      "description": "¿Se consulta a la AEPD cuando procede tras EIPD?",
+      "weight": 2
+    },
+    {
+      "domain": "DPIA",
+      "control_id": "RGPD-35.3",
+      "title": "Revisión de EIPD",
+      "description": "¿Se revisan las EIPD cuando cambian los riesgos?",
+      "weight": 2
+    },
+    {
+      "domain": "Derechos",
+      "control_id": "RGPD-15.1",
+      "title": "Derecho de acceso",
+      "description": "¿Existe procedimiento para atender solicitudes de acceso?",
+      "weight": 2
+    },
+    {
+      "domain": "Derechos",
+      "control_id": "RGPD-17.1",
+      "title": "Derecho de supresión",
+      "description": "¿Se puede suprimir datos cuando procede?",
+      "weight": 2
+    },
+    {
+      "domain": "Derechos",
+      "control_id": "RGPD-20.1",
+      "title": "Portabilidad",
+      "description": "¿Se facilita la portabilidad de datos en formato estructurado?",
+      "weight": 2
+    },
+    {
+      "domain": "Registro",
+      "control_id": "RGPD-30.1",
+      "title": "Registro de actividades",
+      "description": "¿Existe registro de actividades de tratamiento (RAT)?",
+      "weight": 3
+    },
+    {
+      "domain": "Registro",
+      "control_id": "RGPD-30.2",
+      "title": "Contenido del RAT",
+      "description": "¿El RAT incluye finalidades, categorías, plazos y medidas?",
+      "weight": 3
+    },
+    {
+      "domain": "DPO",
+      "control_id": "RGPD-37.1",
+      "title": "Delegado de protección de datos",
+      "description": "¿Se ha designado DPO cuando es obligatorio?",
+      "weight": 2
+    },
+    {
+      "domain": "Transferencias",
+      "control_id": "RGPD-44.1",
+      "title": "Transferencias internacionales",
+      "description": "¿Las transferencias fuera del EEE tienen garantías adecuadas?",
+      "weight": 3
+    },
+    {
+      "domain": "Transferencias",
+      "control_id": "RGPD-46.1",
+      "title": "Cláusulas contractuales",
+      "description": "¿Se usan SCC u otras garantías para transferencias?",
+      "weight": 2
+    },
+    {
+      "domain": "Consentimiento",
+      "control_id": "RGPD-7.1",
+      "title": "Consentimiento válido",
+      "description": "¿El consentimiento es libre, específico, informado e inequívoco?",
+      "weight": 3
+    }
+  ]
+}

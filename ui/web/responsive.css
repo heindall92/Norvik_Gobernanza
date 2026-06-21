@@ -1,0 +1,214 @@
+/* Norvik — responsive breakpoints & fluid layout */
+
+/* Fluid scale tokens (set by JS + media queries) */
+:root {
+  --vp-w: 100vw;
+  --vp-h: 100vh;
+  --app-pad: 18px;
+  --work-pad: 18px;
+  --shell-radius: calc(var(--radius) + 6px);
+  --title-size: clamp(16px, 1.2vw + 14px, 20px);
+  --kpi-value-size: clamp(1.35rem, 1.5vw + 1rem, 1.75rem);
+  --nav-font-size: clamp(12.5px, 0.25vw + 12px, 13.5px);
+}
+
+.glass-panel.norvik-shell {
+  container-type: inline-size;
+  container-name: norvik-shell;
+}
+
+.norvik-topbar__title h1 { font-size: var(--title-size); }
+.glass-box__value { font-size: var(--kpi-value-size); }
+.nav-item { font-size: var(--nav-font-size); }
+
+/* ── XL / LG: desktop wide ── */
+@media (min-width: 1200px) {
+  .norvik-grid--kpi {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ── MD: laptop / sidebar icon-only ── */
+@media (max-width: 1199px) and (min-width: 900px) {
+  .norvik-grid--kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .norvik-grid--mid,
+  .norvik-grid--bottom,
+  .settings-grid { grid-template-columns: 1fr; }
+  .norvik-topbar { padding: 12px 16px; }
+  .norvik-topbar__title p { font-size: 11px; }
+}
+
+/* ── SM: tablet / ventana reducida ── */
+@media (max-width: 899px) {
+  .app-root { padding: var(--app-pad); align-items: stretch; }
+  .glass-panel.norvik-shell { border-radius: var(--shell-radius); }
+
+  .norvik-layout {
+    flex-direction: column;
+    position: relative;
+  }
+
+  .norvik-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(var(--sidebar-width), 86vw);
+    max-width: 320px;
+    flex: none;
+    transform: translateX(-105%);
+    transition: transform .32s var(--ease-out, ease);
+    box-shadow: var(--shadow);
+    border-right: 1px solid var(--line-2);
+  }
+
+  .norvik-layout.sidebar-open .norvik-sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(8, 12, 20, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .28s var(--ease-out, ease);
+    backdrop-filter: blur(2px);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.sidebar-open { overflow: hidden; }
+
+  .norvik-layout.is-drawer-mode .norvik-brand-text,
+  .norvik-layout.is-drawer-mode .nav-item > span:not([data-icon]):not(.badge),
+  .norvik-layout.is-drawer-mode .norvik-sidebar-foot .foot-text,
+  .norvik-layout.is-drawer-mode .collapse-label {
+    opacity: 1;
+    max-width: 200px;
+  }
+
+  .norvik-layout.is-drawer-mode.is-collapsed .norvik-sidebar {
+    transform: translateX(-105%);
+  }
+
+  .btn-nav-toggle { display: inline-flex !important; }
+
+  .norvik-topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .norvik-topbar__title { flex: 1 1 180px; min-width: 0; }
+  .norvik-topbar__title h1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .norvik-topbar__title p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .norvik-topbar__actions { margin-left: auto; }
+
+  .norvik-work { padding: var(--work-pad); }
+
+  .norvik-grid--kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .norvik-grid--mid,
+  .norvik-grid--bottom,
+  .settings-grid { grid-template-columns: 1fr; }
+
+  .radar-wrap { min-height: 220px; }
+  .alerts-list { max-height: none; }
+
+  .norvik-layout.is-drawer-mode .nav-indicator { opacity: 0 !important; }
+
+  .seg { flex-wrap: wrap; width: 100%; max-width: 100%; }
+  .seg button { flex: 1 1 auto; padding: 7px 12px; }
+
+  .ai-messages { max-height: min(50vh, 360px); min-height: 180px; }
+  .ai-input-row { flex-direction: column; }
+  .ai-input-row .ws-btn { width: 100%; }
+
+  .q-toolbar { flex-direction: column; align-items: stretch; }
+  .q-pagination { justify-content: stretch; }
+  .q-pagination .ws-btn { flex: 1; }
+}
+
+/* ── XS: móvil / ventana muy pequeña ── */
+@media (max-width: 639px) {
+  .norvik-grid--kpi { grid-template-columns: 1fr; }
+  .glass-box { padding: 12px 14px; }
+  .glass-box__value { font-size: 1.5rem; }
+
+  .norvik-topbar__actions .ws-btn > span:not([data-icon]) { display: none; }
+  .norvik-topbar__actions .ws-btn { min-width: 40px; padding: 9px 10px; }
+
+  .heatmap-cols,
+  .heatmap-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .heatmap-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none; }
+  .heatmap-wrap::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  .swatches { gap: 10px; justify-content: flex-start; }
+  .sw { width: 28px; height: 28px; }
+  .sw.active { width: 36px; height: 36px; }
+
+  .settings-grid { grid-template-columns: 1fr; }
+
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .hero-glow--back { width: min(90vw, 480px); height: min(90vw, 480px); }
+  .hero-glow--front { width: min(70vw, 320px); height: min(70vw, 320px); }
+
+  .q-levels { gap: 4px; }
+  .q-level { padding: 5px 8px; font-size: 10px; }
+}
+
+/* ── Altura reducida (laptops con barra de tareas / ventana corta) ── */
+@media (max-height: 700px) {
+  .norvik-sidebar { padding: 14px 12px; }
+  .norvik-brand { padding-bottom: 8px; }
+  .norvik-work { padding: 12px; }
+  .radar-wrap { min-height: 200px; }
+  .ai-messages { min-height: 160px; max-height: 280px; }
+  .app-root { padding: 10px; }
+}
+
+/* ── Container queries (dashboard dentro del shell) ── */
+@container norvik-shell (max-width: 900px) {
+  .norvik-grid--kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@container norvik-shell (max-width: 520px) {
+  .norvik-grid--kpi { grid-template-columns: 1fr; }
+  .framework-bar__label { font-size: 12px; }
+}
+
+/* Toggle menú — oculto en desktop */
+.btn-nav-toggle { display: none; }
+
+/* Utilidades por viewport (JS data-viewport) */
+html[data-viewport="md"] .norvik-layout:not(.is-drawer-mode) .nav-indicator { opacity: 1; }
+
+html[data-viewport="xs"] .norvik-step-compact,
+html[data-viewport="sm"] .norvik-step-compact { display: none; }
+
+@media (min-width: 900px) {
+  .sidebar-backdrop { display: none; }
+}

@@ -1,0 +1,110 @@
+/* Norvik — theme tokens from themes.html */
+
+:root {
+  --accent: #ff6a4d;
+  --accent-soft: #ff8a72;
+  --accent2: #22d3ee;
+  --radius: 12px;
+  --speed: 0.28s;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --sidebar-width: 200px;
+
+  --page-0: #1b212b;
+  --page-1: #10151d;
+  --panel: #171d28;
+  --panel-2: #1b2230;
+  --rail: #10151e;
+  --line: rgba(255, 255, 255, 0.06);
+  --line-2: rgba(255, 255, 255, 0.09);
+  --ink: #eef2f8;
+  --ink-2: #aab3c2;
+  --ink-3: #727d8e;
+  --ink-4: #525c6b;
+  --ink-dim: var(--ink-3);
+  --field: #0e131c;
+  --thumb: #fff;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --green: #22c55e;
+  --orange: #f97316;
+
+  --page-bg: radial-gradient(120% 80% at 30% 0%, #2a3340 0%, transparent 55%),
+    radial-gradient(120% 90% at 80% 100%, #222b37 0%, transparent 55%),
+    linear-gradient(160deg, #222a36, #0c1118 90%);
+  --panel-grad: linear-gradient(180deg, rgba(40, 50, 66, 0.5), rgba(18, 23, 32, 0.65));
+  --rail-grad: linear-gradient(180deg, rgba(14, 19, 28, 0.7), rgba(10, 14, 21, 0.85));
+  --topbar-bg: linear-gradient(180deg, rgba(14, 19, 28, 0.35), transparent);
+  --tile-bg: #0f141d;
+  --box-bg: linear-gradient(180deg, rgba(24, 30, 42, 0.88), rgba(12, 16, 24, 0.92));
+  --box-border: var(--line-2);
+  --track: rgba(255, 255, 255, 0.05);
+  --hover: rgba(255, 255, 255, 0.04);
+  --hover-2: rgba(255, 255, 255, 0.08);
+  --shadow: 0 40px 90px -36px rgba(0, 0, 0, 0.85);
+  --glass-border: var(--line-2);
+  --glass-border-soft: var(--line);
+  --shell-bg: var(--panel-grad);
+  --shell-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --sidebar-bg: var(--rail-grad);
+  --sidebar-border: var(--line);
+  --step-hover-bg: var(--hover);
+  --step-hover-border: var(--line-2);
+  --step-active-bg: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 28%, transparent),
+    color-mix(in srgb, var(--accent) 8%, transparent));
+  --step-active-shadow: 0 0 24px -6px color-mix(in srgb, var(--accent) 60%, transparent);
+  --btn-bg: var(--hover);
+  --btn-primary-bg: linear-gradient(180deg, color-mix(in srgb, var(--accent) 95%, #000), var(--accent));
+  --btn-hover-shadow: 0 4px 14px -4px color-mix(in srgb, var(--accent) 80%, transparent);
+  --scene-radial-1: radial-gradient(120% 80% at 30% 0%, color-mix(in srgb, var(--accent) 18%, #2a3340) 0%, transparent 55%);
+  --scene-radial-2: radial-gradient(120% 90% at 80% 100%, rgba(34, 43, 55, 0.9) 0%, transparent 55%);
+  --scene-linear: linear-gradient(160deg, #222a36, #0c1118 90%);
+  --hero-glow: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%);
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, sans-serif;
+}
+
+body.light {
+  --line: rgba(15, 23, 42, 0.11);
+  --line-2: rgba(15, 23, 42, 0.18);
+  --ink: #1b2230;
+  --ink-2: #3d4d66;
+  --ink-3: #6b7a92;
+  --ink-4: #8a97ad;
+  --ink-dim: var(--ink-3);
+  --field: #ffffff;
+  --page-bg: radial-gradient(120% 80% at 30% 0%, color-mix(in srgb, var(--accent) 8%, #eef1f6) 0%, transparent 55%),
+    radial-gradient(120% 90% at 80% 100%, #e6ebf3 0%, transparent 55%),
+    linear-gradient(160deg, #e9edf3, #cdd5e2 90%);
+  --panel-grad: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 251, 0.98));
+  --rail-grad: linear-gradient(180deg, rgba(252, 253, 255, 0.98), rgba(240, 244, 250, 0.98));
+  --topbar-bg: linear-gradient(180deg, rgba(252, 253, 255, 0.85), transparent);
+  --tile-bg: #f3f6fa;
+  --box-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 249, 252, 0.99));
+  --box-border: rgba(15, 23, 42, 0.12);
+  --track: rgba(15, 23, 42, 0.1);
+  --hover: rgba(15, 23, 42, 0.06);
+  --hover-2: rgba(15, 23, 42, 0.1);
+  --shadow: 0 30px 70px -34px rgba(30, 41, 70, 0.35);
+  --scene-radial-1: radial-gradient(120% 80% at 30% 0%, color-mix(in srgb, var(--accent) 18%, #eef1f6) 0%, transparent 55%);
+  --scene-radial-2: radial-gradient(120% 90% at 80% 100%, color-mix(in srgb, var(--accent) 6%, #e6ebf3) 0%, transparent 55%);
+  --scene-linear: linear-gradient(160deg, #e9edf3, #cdd5e2 90%);
+  --step-active-bg: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 38%, #fff),
+    color-mix(in srgb, var(--accent) 16%, #fff));
+  --step-active-shadow: 0 0 28px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+  --btn-bg: #ffffff;
+}
+
+body.font-mono {
+  --font-body: var(--font-mono);
+  --font-display: var(--font-mono);
+}
+
+.level-0 { background: rgba(239, 68, 68, 0.7); color: #fff; }
+.level-1 { background: rgba(239, 68, 68, 0.45); color: #fff; }
+.level-2 { background: rgba(234, 179, 8, 0.5); color: #1b2230; }
+.level-3 { background: color-mix(in srgb, var(--accent) 35%, transparent); color: #fff; }
+.level-4 { background: rgba(34, 197, 94, 0.5); color: #1b2230; }
+.level-5 { background: rgba(34, 197, 94, 0.8); color: #fff; }

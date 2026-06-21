@@ -1,0 +1,308 @@
+{
+  "code": "CIS_V8",
+  "name": "CIS Controls v8",
+  "version": "8.0",
+  "controls": [
+    {
+      "domain": "CIS 1",
+      "control_id": "CIS-1.1",
+      "title": "Inventario de activos empresariales",
+      "description": "Establecer y mantener un inventario detallado de activos.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 1",
+      "control_id": "CIS-1.2",
+      "title": "Inventario de software",
+      "description": "Inventario de software autorizado.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 1",
+      "control_id": "CIS-1.3",
+      "title": "Utilizar herramientas de descubrimiento",
+      "description": "Utilizar herramientas activas de descubrimiento.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 2",
+      "control_id": "CIS-2.1",
+      "title": "Software de inventario autorizado",
+      "description": "Solo software autorizado instalado.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 2",
+      "control_id": "CIS-2.2",
+      "title": "Lista de permitidos de software",
+      "description": "Lista de permitidos implementada.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 2",
+      "control_id": "CIS-2.3",
+      "title": "Lista de bloqueados",
+      "description": "Lista de bloqueados implementada.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 3",
+      "control_id": "CIS-3.1",
+      "title": "Gestión de vulnerabilidades",
+      "description": "Proceso de gestión de vulnerabilidades establecido.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 3",
+      "control_id": "CIS-3.2",
+      "title": "Escaneo de vulnerabilidades",
+      "description": "Escaneo regular de vulnerabilidades.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 3",
+      "control_id": "CIS-3.3",
+      "title": "Remediación de vulnerabilidades",
+      "description": "Remediar vulnerabilidades según SLA.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 4",
+      "control_id": "CIS-4.1",
+      "title": "Inventario de cuentas administrativas",
+      "description": "Inventario de cuentas administrativas.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 4",
+      "control_id": "CIS-4.2",
+      "title": "Cambio de credenciales por defecto",
+      "description": "Cambiar credenciales por defecto.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 4",
+      "control_id": "CIS-4.3",
+      "title": "MFA en accesos administrativos",
+      "description": "MFA en accesos administrativos.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 5",
+      "control_id": "CIS-5.1",
+      "title": "Inventario de cuentas",
+      "description": "Inventario de cuentas de usuario.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 5",
+      "control_id": "CIS-5.2",
+      "title": "Cuentas únicas",
+      "description": "Cuentas únicas por usuario.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 5",
+      "control_id": "CIS-5.3",
+      "title": "Desactivar cuentas inactivas",
+      "description": "Desactivar cuentas inactivas en 45 días.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 6",
+      "control_id": "CIS-6.1",
+      "title": "Registro de accesos",
+      "description": "Registrar accesos a sistemas críticos.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 6",
+      "control_id": "CIS-6.2",
+      "title": "Revisión de logs",
+      "description": "Revisar logs de acceso regularmente.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 6",
+      "control_id": "CIS-6.3",
+      "title": "Sincronización de tiempo",
+      "description": "Sincronizar relojes de sistemas.",
+      "weight": 1
+    },
+    {
+      "domain": "CIS 7",
+      "control_id": "CIS-7.1",
+      "title": "Protección contra malware",
+      "description": "Software antimalware en todos los activos.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 7",
+      "control_id": "CIS-7.2",
+      "title": "Actualización de firmas",
+      "description": "Actualizar firmas antimalware automáticamente.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 8",
+      "control_id": "CIS-8.1",
+      "title": "Recuperación de datos",
+      "description": "Proceso de recuperación de datos establecido.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 8",
+      "control_id": "CIS-8.2",
+      "title": "Copias de seguridad",
+      "description": "Realizar copias de seguridad periódicas.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 8",
+      "control_id": "CIS-8.3",
+      "title": "Prueba de restauración",
+      "description": "Probar restauración de copias.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 9",
+      "control_id": "CIS-9.1",
+      "title": "Controles de acceso a red",
+      "description": "Controles de acceso a la red implementados.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 9",
+      "control_id": "CIS-9.2",
+      "title": "Firewalls en dispositivos",
+      "description": "Firewalls en dispositivos de usuario.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 10",
+      "control_id": "CIS-10.1",
+      "title": "Respaldos de configuración",
+      "description": "Respaldar configuraciones de red.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 10",
+      "control_id": "CIS-10.2",
+      "title": "Configuración segura",
+      "description": "Configuraciones seguras en dispositivos de red.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 11",
+      "control_id": "CIS-11.1",
+      "title": "Estándares de configuración",
+      "description": "Estándares de configuración segura establecidos.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 11",
+      "control_id": "CIS-11.2",
+      "title": "Hardening de servidores",
+      "description": "Hardening en servidores.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 12",
+      "control_id": "CIS-12.1",
+      "title": "Gestión de parches",
+      "description": "Proceso de gestión de parches establecido.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 12",
+      "control_id": "CIS-12.2",
+      "title": "Parches en 30 días",
+      "description": "Aplicar parches críticos en 30 días.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 13",
+      "control_id": "CIS-13.1",
+      "title": "Programa de concienciación",
+      "description": "Programa de concienciación en seguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 13",
+      "control_id": "CIS-13.2",
+      "title": "Simulaciones de phishing",
+      "description": "Simulaciones periódicas de phishing.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 14",
+      "control_id": "CIS-14.1",
+      "title": "Plan de respuesta a incidentes",
+      "description": "Plan de respuesta a incidentes documentado.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 14",
+      "control_id": "CIS-14.2",
+      "title": "Equipo de respuesta",
+      "description": "Equipo de respuesta designado.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 15",
+      "control_id": "CIS-15.1",
+      "title": "Inventario de proveedores",
+      "description": "Inventario de proveedores de servicios.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 15",
+      "control_id": "CIS-15.2",
+      "title": "Evaluación de proveedores",
+      "description": "Evaluar seguridad de proveedores.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 16",
+      "control_id": "CIS-16.1",
+      "title": "Desarrollo seguro",
+      "description": "Prácticas de desarrollo seguro establecidas.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 16",
+      "control_id": "CIS-16.2",
+      "title": "Revisión de código",
+      "description": "Revisión de código de seguridad.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 17",
+      "control_id": "CIS-17.1",
+      "title": "Programa de gestión de incidentes",
+      "description": "Programa formal de gestión de incidentes.",
+      "weight": 3
+    },
+    {
+      "domain": "CIS 17",
+      "control_id": "CIS-17.2",
+      "title": "Clasificación de incidentes",
+      "description": "Clasificar y priorizar incidentes.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 18",
+      "control_id": "CIS-18.1",
+      "title": "Penetration testing",
+      "description": "Pruebas de penetración periódicas.",
+      "weight": 2
+    },
+    {
+      "domain": "CIS 18",
+      "control_id": "CIS-18.2",
+      "title": "Red team exercises",
+      "description": "Ejercicios de red team periódicos.",
+      "weight": 2
+    }
+  ]
+}

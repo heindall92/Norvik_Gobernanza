@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Iconly — Upload</title>
+<style>
+  :root{
+    --bg:#ececee;
+    --bg-2:#e6e7e9;
+    --card:#fbfbfc;
+    --card-2:#f4f4f6;
+    --ink:#15171c;
+    --ink-2:#8a9099;
+    --ink-3:#aeb3bb;
+    --blue:#1f6bff;
+    --blue-2:#2f7bff;
+    --blue-deep:#0b5bf5;
+    --blue-soft:#cfe0ff;
+    --blue-tint:#e8f0ff;
+    --line:#d9dbe0;
+    --shadow-dark:#cfd1d6;
+    --shadow-light:#ffffff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Poppins",-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+    background:radial-gradient(130% 100% at 50% 0%,#f2f2f4,var(--bg) 60%,var(--bg-2));
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:34px 20px;
+  }
+
+  .frame{width:100%;max-width:560px;position:relative}
+
+  /* ---------- header ---------- */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:0 8px 22px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mark{
+    width:34px;height:34px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(155deg,#3b82ff,#1f54ff);
+    box-shadow:0 6px 14px -4px rgba(31,84,255,.55),inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .brand .mark svg{width:18px;height:18px;color:#fff}
+  .brand .name{font-size:21px;font-weight:700;letter-spacing:-.02em}
+  .top .set{color:var(--ink-3);font-size:17px;font-weight:500}
+
+  /* ---------- main card ---------- */
+  .card{
+    background:linear-gradient(180deg,#fff,#f6f6f8);
+    border-radius:34px;padding:18px;
+    box-shadow:
+      0 30px 60px -28px rgba(60,64,80,.4),
+      0 2px 0 rgba(255,255,255,.9) inset,
+      0 -10px 30px -20px rgba(0,0,0,.05) inset;
+  }
+
+  /* dropzone */
+  .drop{
+    border:2px dashed #c9ccd3;border-radius:24px;
+    padding:30px 34px 34px;text-align:center;
+    background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(244,244,247,.4));
+    transition:border-color .2s,background .2s;cursor:pointer;
+  }
+  .drop.drag{border-color:var(--blue);background:var(--blue-tint)}
+  .drop h2{font-size:21px;font-weight:650;letter-spacing:-.01em}
+  .up-btn{
+    width:118px;height:118px;border-radius:50%;margin:20px auto 22px;position:relative;
+    display:grid;place-items:center;cursor:pointer;
+    background:radial-gradient(circle at 38% 30%,#ffffff,#eaf1ff 70%,#dbe7ff);
+    box-shadow:0 10px 26px -8px rgba(31,107,255,.45),inset 0 2px 4px rgba(255,255,255,.9),
+               inset 0 -6px 12px rgba(150,180,255,.35);
+  }
+  .up-btn::after{ /* blue glow bleeding downward */
+    content:"";position:absolute;left:50%;top:58%;width:150%;height:120%;
+    transform:translateX(-50%);z-index:-1;pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(60,120,255,.45),rgba(60,120,255,0) 60%);
+    filter:blur(14px);
+  }
+  .up-btn svg{width:42px;height:42px;color:var(--blue);position:relative;z-index:1}
+  .drop p{color:var(--ink-2);font-size:16px;line-height:1.5;font-weight:450;max-width:430px;margin:0 auto}
+
+  /* upload item */
+  .item{
+    margin-top:16px;background:linear-gradient(180deg,#fff,#f7f7f9);
+    border-radius:24px;padding:18px 18px 20px;
+    box-shadow:0 14px 30px -20px rgba(60,64,80,.4),inset 0 1px 0 rgba(255,255,255,.8);
+    transition:opacity .35s,transform .35s,margin .35s,padding .35s,max-height .35s;
+    overflow:hidden;
+  }
+  .item.removed{opacity:0;transform:scale(.96);max-height:0;margin-top:0;padding-top:0;padding-bottom:0}
+  .item-row{display:flex;align-items:center;gap:16px}
+  .thumb{
+    width:62px;height:62px;border-radius:17px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(165deg,#eef3ff,#dbe6ff);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 14px -8px rgba(31,107,255,.4);
+  }
+  .thumb svg{width:30px;height:30px;color:var(--blue)}
+  .item-meta{flex:1;min-width:0}
+  .item-meta h3{font-size:19px;font-weight:650;letter-spacing:-.01em}
+  .item-meta .sub{color:var(--ink-2);font-size:15px;font-weight:450;margin-top:3px}
+  .close{
+    width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;cursor:pointer;
+    background:linear-gradient(180deg,#fff,#f1f1f3);color:var(--ink-2);border:none;
+    box-shadow:0 4px 10px -5px rgba(60,64,80,.4),inset 0 1px 0 rgba(255,255,255,.9),0 0 0 1px rgba(0,0,0,.02);
+    transition:transform .15s,color .15s;
+  }
+  .close:hover{transform:scale(1.06);color:var(--ink)}
+  .close svg{width:18px;height:18px}
+  .bar{height:11px;border-radius:99px;background:#e2e4e9;margin-top:18px;overflow:hidden;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.08)}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,#1f6bff,#3b82ff);
+    box-shadow:0 0 10px -1px rgba(31,107,255,.6);
+    transition:width 1.2s cubic-bezier(.4,.1,.2,1)}
+
+  /* action buttons */
+  .actions{display:grid;grid-template-columns:1fr 1.18fr;gap:16px;margin-top:18px;padding:0 2px}
+  .btn{
+    height:64px;border-radius:99px;border:none;cursor:pointer;font-family:inherit;
+    font-size:19px;font-weight:650;letter-spacing:-.01em;transition:transform .14s,box-shadow .2s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{
+    background:linear-gradient(180deg,#fff,#f3f3f5);color:var(--ink);
+    box-shadow:0 8px 18px -12px rgba(60,64,80,.5),inset 0 1px 0 rgba(255,255,255,.9),0 0 0 1px rgba(0,0,0,.025);
+  }
+  .btn.ghost:hover{box-shadow:0 10px 22px -12px rgba(60,64,80,.55),inset 0 1px 0 #fff,0 0 0 1px rgba(0,0,0,.04)}
+  .btn.primary{
+    color:#fff;background:linear-gradient(180deg,#2f7bff,#0f5cf5);
+    box-shadow:0 14px 28px -10px rgba(20,90,250,.65),inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .btn.primary:hover{box-shadow:0 18px 34px -10px rgba(20,90,250,.7),inset 0 1px 0 rgba(255,255,255,.4)}
+
+  /* bottom nav */
+  .nav{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    padding:26px 18px 10px;position:relative;
+  }
+  .nav-item{display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;flex:1;
+    color:var(--ink-3);font-size:15px;font-weight:500;transition:color .15s}
+  .nav-item .ic{width:34px;height:34px;display:grid;place-items:center}
+  .nav-item .ic svg{width:26px;height:26px}
+  .nav-item:hover{color:var(--ink-2)}
+  .nav-item.active{color:var(--ink);font-weight:600}
+  .nav-item.active .chip{
+    width:50px;height:42px;border-radius:13px;display:grid;place-items:center;
+    background:#0c0e12;color:#fff;box-shadow:0 8px 16px -8px rgba(0,0,0,.5)
+  }
+  .nav-item.active .chip svg{width:24px;height:24px}
+  .fab-slot{flex:1;display:flex;justify-content:center}
+  .fab{
+    width:78px;height:78px;border-radius:50%;margin-top:-12px;display:grid;place-items:center;cursor:pointer;
+    background:linear-gradient(180deg,#fff,#f0f0f2);color:var(--ink);border:none;
+    box-shadow:0 16px 30px -12px rgba(60,64,80,.45),inset 0 1px 0 rgba(255,255,255,.9),0 0 0 1px rgba(0,0,0,.02);
+    transition:transform .14s;
+  }
+  .fab:hover{transform:scale(1.05) translateY(-12px)}
+  .fab svg{width:30px;height:30px}
+
+  /* footer */
+  .foot{display:flex;align-items:center;justify-content:space-between;
+    padding:22px 10px 0;color:var(--ink-3);font-size:16px;font-weight:450}
+  .foot .more{display:flex;align-items:center;gap:8px}
+  .foot .more svg{width:18px;height:18px}
+
+  /* hidden native input */
+  #file{display:none}
+
+  @media (max-width:520px){
+    .top .set{font-size:15px}
+    .drop{padding:24px 18px 28px}
+    .drop h2{font-size:18px}
+    .drop p{font-size:14px}
+    .up-btn{width:100px;height:100px}
+    .item-meta h3{font-size:17px}
+    .item-meta .sub{font-size:13px}
+    .btn{font-size:17px;height:58px}
+    .nav-item{font-size:13px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <main class="frame">
+    <!-- HEADER -->
+    <div class="top">
+      <div class="brand">
+        <span class="mark">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M16 8.5a5 5 0 1 0 0 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        </span>
+        <span class="name">Iconly</span>
+      </div>
+      <span class="set">Icon Set</span>
+    </div>
+
+    <!-- CARD -->
+    <section class="card">
+      <!-- DROPZONE -->
+      <div class="drop" id="drop">
+        <h2>Drop your video here</h2>
+        <div class="up-btn" id="pick" role="button" aria-label="Choose video">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 16V4"/><path d="m7 9 5-5 5 5"/>
+            <path d="M5 14v3a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-3"/>
+          </svg>
+        </div>
+        <p>For best results, video uploads should be at least 1080p (1920 x 1080 pixels) in MP4 format.</p>
+        <input type="file" id="file" accept="video/mp4,video/*" />
+      </div>
+
+      <!-- UPLOAD ITEM -->
+      <div class="item" id="item">
+        <div class="item-row">
+          <span class="thumb">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="13" height="12" rx="3.5" fill="currentColor"/><path d="m18 9 3-2v10l-3-2z" fill="currentColor"/></svg>
+          </span>
+          <div class="item-meta">
+            <h3 id="fname">Class meeting</h3>
+            <div class="sub" id="fmeta">MP4 · 24 MB · 4 sec left</div>
+          </div>
+          <button class="close" id="close" aria-label="Cancel upload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="bar"><i id="prog"></i></div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn primary" id="upload">Upload</button>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <nav class="nav">
+        <div class="nav-item" data-tab="home">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"/><path d="M6 10v8a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 18v-8"/><path d="M10 13.5h4"/></svg></span>
+          <span>Home</span>
+        </div>
+        <div class="nav-item active" data-tab="files">
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="currentColor"/><path d="M9 12h6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+          <span>Files</span>
+        </div>
+        <div class="fab-slot">
+          <button class="fab" id="fab" aria-label="Add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="nav-item" data-tab="alerts">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span>
+          <span>Alerts</span>
+        </div>
+        <div class="nav-item" data-tab="account">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="10" r="2.6"/><path d="M7.5 18a4.5 4.5 0 0 1 9 0" stroke-linecap="round"/></svg></span>
+          <span>Account</span>
+        </div>
+      </nav>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="foot">
+      <span>iconly.pro</span>
+      <span class="more">Swipe for More
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
+      </span>
+    </div>
+  </main>
+
+<script>
+  const prog=document.getElementById("prog");
+  const item=document.getElementById("item");
+  const drop=document.getElementById("drop");
+  const fileInput=document.getElementById("file");
+
+  /* animate the progress bar to ~75% like the mock, on load */
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ prog.style.width="75%"; }));
+
+  /* format helpers */
+  const fmtMB = b => (b/1048576).toFixed(b<10485760?1:0)+" MB";
+
+  function showFile(file){
+    item.classList.remove("removed");
+    document.getElementById("fname").textContent = file.name.replace(/\.[^.]+$/,"") || "Class meeting";
+    const ext=(file.name.split(".").pop()||"MP4").toUpperCase();
+    const secs=Math.max(1,Math.round(file.size/6e6));
+    document.getElementById("fmeta").textContent = `${ext} · ${fmtMB(file.size)} · ${secs} sec left`;
+    // restart progress animation
+    prog.style.transition="none"; prog.style.width="0";
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      prog.style.transition=""; prog.style.width="75%";
+    }));
+  }
+
+  /* file picking */
+  document.getElementById("pick").addEventListener("click",e=>{e.stopPropagation();fileInput.click();});
+  drop.addEventListener("click",()=>fileInput.click());
+  fileInput.addEventListener("change",e=>{ if(e.target.files[0]) showFile(e.target.files[0]); });
+
+  /* drag & drop */
+  ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{
+    e.preventDefault();drop.classList.add("drag");
+  }));
+  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{
+    e.preventDefault();
+    if(ev==="dragleave" && drop.contains(e.relatedTarget)) return;
+    drop.classList.remove("drag");
+  }));
+  drop.addEventListener("drop",e=>{ if(e.dataTransfer.files[0]) showFile(e.dataTransfer.files[0]); });
+
+  /* dismiss item */
+  document.getElementById("close").addEventListener("click",()=>item.classList.add("removed"));
+  document.getElementById("cancel").addEventListener("click",()=>item.classList.add("removed"));
+
+  /* upload feedback */
+  document.getElementById("upload").addEventListener("click",function(){
+    if(item.classList.contains("removed")){ item.classList.remove("removed"); prog.style.width="0";
+      requestAnimationFrame(()=>requestAnimationFrame(()=>prog.style.width="20%")); }
+    prog.style.width="100%";
+    const old=this.textContent; this.textContent="Uploaded ✓";
+    setTimeout(()=>this.textContent=old,1500);
+  });
+
+  /* tabs */
+  document.querySelectorAll(".nav-item").forEach(t=>t.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+    t.classList.add("active");
+  }));
+
+  /* fab opens file picker too */
+  document.getElementById("fab").addEventListener("click",()=>fileInput.click());
+</script>
+</body>
+</html>
