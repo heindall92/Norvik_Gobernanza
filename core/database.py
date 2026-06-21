@@ -250,6 +250,23 @@ def is_demo_mode(conn: sqlite3.Connection) -> bool:
     return get_setting(conn, "demo_mode", "0") == "1"
 
 
+def is_demo_assessment_note(notes: str) -> bool:
+    n = (notes or "").strip()
+    return n.startswith(DEMO_NOTE) or n == LEGACY_DEMO_NOTE
+
+
+def exit_demo_mode_on_real_entry(conn: sqlite3.Connection) -> None:
+    """Hide demo badge once the user starts entering real assessment data."""
+    if get_setting(conn, "demo_mode", "0") != "1":
+        return
+    set_setting(conn, "demo_mode", "0")
+    conn.commit()
+
+
+def should_show_demo_ui(conn: sqlite3.Connection) -> bool:
+    return is_demo_mode(conn)
+
+
 def _seed_demo_assessments(conn: sqlite3.Connection) -> None:
     """Deprecated: use load_demo_assessments() explicitly."""
     load_demo_assessments(conn)

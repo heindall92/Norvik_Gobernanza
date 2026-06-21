@@ -9,19 +9,17 @@ from typing import Any
 import urllib.error
 import urllib.request
 
+from core.i18n import (
+    EXECUTIVE_PROMPTS,
+    GAP_LABELS,
+    RECOMMENDATION_PROMPTS,
+    effective_locale,
+    gap_labels,
+    system_prompt as locale_system_prompt,
+)
 from core.settings import get_all_settings
 
-DEFAULT_SYSTEM_PROMPT = """Eres un experto senior en GRC (Governance, Risk & Compliance) especializado en NIST CSF 2.0, ISO 27001:2022, CIS Controls v8 y RGPD.
-
-Tu rol en Norvik:
-- Analizar brechas de madurez y priorizar remediación.
-- Apoyar decisiones de auditoría con criterio técnico y de negocio.
-- Sugerir controles, evidencias y planes de acción verificables.
-- Redactar recomendaciones para informes ejecutivos y técnicos.
-
-Responde siempre en español, con tono profesional y directo.
-Estructura: contexto breve → hallazgos → decisiones recomendadas → acciones (esfuerzo Alto/Medio/Bajo) → referencias normativas.
-Evita consejos genéricos; sé específico al control, dominio y nivel CMM indicados."""
+DEFAULT_SYSTEM_PROMPT = locale_system_prompt({})
 
 # API cloud oficial: https://ollama.com/api (docs.ollama.com/api/introduction)
 CLOUD_HOST = "https://ollama.com"
@@ -95,27 +93,36 @@ def _pick_model(settings: dict[str, str], available: list[str]) -> str:
     return available[0]
 
 
-def system_prompt(settings: dict[str, str] | None = None) -> str:
-    settings = settings or {}
-    custom = (settings.get("ai_system_prompt") or "").strip()
-    return custom or DEFAULT_SYSTEM_PROMPT
+def system_prompt(settings: dict[str, str] | None = None, user_text: str = "") -> str:
+    return locale_system_prompt(settings, user_text)
 
 
-def _context_prompt(settings: dict[str, str]) -> str:
+def _context_prompt(settings: dict[str, str], user_text: str = "") -> str:
     org = (settings.get("org_name") or "").strip()
     user = (settings.get("user_name") or "").strip()
     role = (settings.get("user_role") or "").strip()
     dept = (settings.get("user_department") or "").strip()
-    parts = [system_prompt(settings)]
+    locale = effective_locale(settings, user_text)
+    parts = [system_prompt(settings, user_text)]
     ctx = []
-    if org:
-        ctx.append(f"Organización: {org}")
-    if user:
-        ctx.append(f"Auditor/responsable: {user}" + (f" ({role})" if role else ""))
-    if dept:
-        ctx.append(f"Departamento: {dept}")
-    if ctx:
-        parts.append("Contexto del cliente:\n" + "\n".join(ctx))
+    if locale == "en":
+        if org:
+            ctx.append(f"Organization: {org}")
+        if user:
+            ctx.append(f"Auditor/owner: {user}" + (f" ({role})" if role else ""))
+        if dept:
+            ctx.append(f"Department: {dept}")
+        if ctx:
+            parts.append("Client context:\n" + "\n".join(ctx))
+    else:
+        if org:
+            ctx.append(f"Organización: {org}")
+        if user:
+            ctx.append(f"Auditor/responsable: {user}" + (f" ({role})" if role else ""))
+        if dept:
+            ctx.append(f"Departamento: {dept}")
+        if ctx:
+            parts.append("Contexto del cliente:\n" + "\n".join(ctx))
     return "\n\n".join(parts)
 
 
@@ -384,10 +391,10 @@ def _run_chat(
 
     model = status.get("model") or _pick_model(settings, status.get("available_models") or [])
     provider = _provider(settings)
-    sys_msg = _context_prompt(settings)
-    full_messages = [{"role": "system", "content": sys_msg}] + [
-        m for m in messages if m.get("role") != "system"
-    ]
+    user_msgs = [m for m in messages if m.get("role") != "system"]
+    user_text = " ".join(str(m.get("content", "")) for m in user_msgs)
+    sys_msg = _context_prompt(settings, user_text)
+    full_messages = [{"role": "system", "content": sys_msg}] + user_msgs
 
     try:
         if provider == "cloud":
@@ -409,14 +416,17 @@ def _run_chat(
 def get_recommendations(gap_data: dict[str, Any], settings: dict[str, str] | None = None) -> dict[str, Any]:
     settings = settings or {}
     status = test_connection(settings)
+    locale = effective_locale(settings, gap_data.get("notes") or gap_data.get("title") or "")
+    labels = gap_labels(locale)
+    notes = (gap_data.get("notes") or "").strip() or labels["no_notes"]
     user_prompt = (
-        f"Control: {gap_data.get('control_id', '')} — {gap_data.get('title', '')}\n"
-        f"Framework: {gap_data.get('framework', '')}\n"
-        f"Dominio: {gap_data.get('domain', '')}\n"
-        f"Nivel actual CMM: {gap_data.get('current_level', 0)}/5\n"
-        f"Nivel objetivo CMM: {gap_data.get('target_level', 3)}/5\n"
-        f"Notas del auditor: {gap_data.get('notes', 'Sin notas')}\n\n"
-        "Entrega recomendaciones accionables para cerrar la brecha y decisiones de auditoría."
+        f"{labels['control']}: {gap_data.get('control_id', '')} — {gap_data.get('title', '')}\n"
+        f"{labels['framework']}: {gap_data.get('framework', '')}\n"
+        f"{labels['domain']}: {gap_data.get('domain', '')}\n"
+        f"{labels['current_cmm']}: {gap_data.get('current_level', 0)}/5\n"
+        f"{labels['target_cmm']}: {gap_data.get('target_level', 3)}/5\n"
+        f"{labels['auditor_notes']}: {notes}\n\n"
+        f"{RECOMMENDATION_PROMPTS[locale]}"
     )
     return _run_chat([{"role": "user", "content": user_prompt}], settings, status=status)
 
@@ -448,25 +458,33 @@ def generate_executive_summary(
         if a.get("severity") == "critical"
     ][:8]
 
-    notes = (
-        f"Score global {round(dashboard.get('global_score') or 0)}% "
-        f"(nota {dashboard.get('grade', '—')}). "
-        f"Controles conformes: {dashboard.get('controls_met', 0)}. "
-        f"No conformes: {dashboard.get('non_compliant', 0)}. "
-        f"Críticas: {dashboard.get('critical_count', 0)}, "
-        f"advertencias: {dashboard.get('warning_count', 0)}. "
-        f"Marcos: {'; '.join(fw_parts) or 'sin datos'}."
-    )
-    if top_critical:
-        notes += f" Brechas críticas destacadas: {', '.join(top_critical)}."
+    locale = effective_locale(settings)
+    if locale == "en":
+        notes = (
+            f"Global score {round(dashboard.get('global_score') or 0)}% "
+            f"(grade {dashboard.get('grade', '—')}). "
+            f"Compliant controls: {dashboard.get('controls_met', 0)}. "
+            f"Non-compliant: {dashboard.get('non_compliant', 0)}. "
+            f"Critical: {dashboard.get('critical_count', 0)}, "
+            f"warnings: {dashboard.get('warning_count', 0)}. "
+            f"Frameworks: {'; '.join(fw_parts) or 'no data'}."
+        )
+        if top_critical:
+            notes += f" Key critical gaps: {', '.join(top_critical)}."
+    else:
+        notes = (
+            f"Score global {round(dashboard.get('global_score') or 0)}% "
+            f"(nota {dashboard.get('grade', '—')}). "
+            f"Controles conformes: {dashboard.get('controls_met', 0)}. "
+            f"No conformes: {dashboard.get('non_compliant', 0)}. "
+            f"Críticas: {dashboard.get('critical_count', 0)}, "
+            f"advertencias: {dashboard.get('warning_count', 0)}. "
+            f"Marcos: {'; '.join(fw_parts) or 'sin datos'}."
+        )
+        if top_critical:
+            notes += f" Brechas críticas destacadas: {', '.join(top_critical)}."
 
-    user_prompt = (
-        "Redacta un ANÁLISIS EJECUTIVO para un informe PDF de GRC (2-4 párrafos).\n"
-        "Debe interpretar los datos detectados, argumentar el nivel de riesgo y priorizar acciones.\n"
-        "Referencia explícitamente score global, marcos normativos y brechas críticas.\n"
-        "Cierra con 3-5 decisiones recomendadas numeradas para la dirección.\n\n"
-        f"Datos de la evaluación:\n{notes}"
-    )
+    user_prompt = EXECUTIVE_PROMPTS[locale].format(notes=notes)
     return _run_chat([{"role": "user", "content": user_prompt}], settings, status=status)
 
 
@@ -474,5 +492,7 @@ def chat_message(message: str, settings: dict[str, str] | None = None) -> dict[s
     settings = settings or {}
     text = (message or "").strip()
     if not text:
-        return {"ok": False, "error": "Mensaje vacío", "content": ""}
+        locale = effective_locale(settings)
+        err = "Empty message" if locale == "en" else "Mensaje vacío"
+        return {"ok": False, "error": err, "content": ""}
     return _run_chat([{"role": "user", "content": text}], settings)

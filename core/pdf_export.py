@@ -13,6 +13,7 @@ from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from core.database import get_documents_dir, is_demo_mode
+from core.i18n import normalize_locale, pdf_strings
 from core.maturity import (
     compute_global_score,
     get_alerts,
@@ -149,16 +150,17 @@ def _resolve_ai_summary(conn, ai_summary: str | None, settings: dict) -> tuple[s
     return "", err
 
 
-def _summary_table(dashboard: dict) -> Table:
+def _summary_table(dashboard: dict, labels: dict | None = None) -> Table:
+    L = labels or pdf_strings("es")
     data = [
-        ["Indicador", "Valor"],
-        ["Score global", f"{round(dashboard.get('global_score') or 0)}%"],
-        ["Calificación", dashboard.get("grade") or score_to_grade(dashboard.get("global_score") or 0)],
-        ["Controles evaluados", str(dashboard.get("total_controls") or 0)],
-        ["Conformes", str(dashboard.get("controls_met") or 0)],
-        ["No conformes", str(dashboard.get("non_compliant") or 0)],
-        ["Brechas críticas", str(dashboard.get("critical_count") or 0)],
-        ["Advertencias", str(dashboard.get("warning_count") or 0)],
+        [L["indicator"], L["value"]],
+        [L["global_score"], f"{round(dashboard.get('global_score') or 0)}%"],
+        [L["grade"], dashboard.get("grade") or score_to_grade(dashboard.get("global_score") or 0)],
+        [L["controls_evaluated"], str(dashboard.get("total_controls") or 0)],
+        [L["compliant"], str(dashboard.get("controls_met") or 0)],
+        [L["non_compliant"], str(dashboard.get("non_compliant") or 0)],
+        [L["critical_gaps_count"], str(dashboard.get("critical_count") or 0)],
+        [L["warnings"], str(dashboard.get("warning_count") or 0)],
     ]
     table = Table(data, colWidths=[7 * cm, 5 * cm])
     table.setStyle(_table_style())
@@ -238,6 +240,8 @@ def generate_report(
         output_path = docs / f"Norvik_Informe_{stamp}.pdf"
 
     settings = settings or get_all_settings(conn)
+    locale = normalize_locale(settings.get("language"))
+    L = pdf_strings(locale)
     dashboard = get_dashboard_payload(conn, "ALL")
     global_score = dashboard.get("global_score") or compute_global_score(conn)
     grade = dashboard.get("grade") or score_to_grade(global_score)
@@ -245,51 +249,34 @@ def generate_report(
     story = []
 
     story.append(Paragraph("Norvik", styles["title"]))
-    story.append(Paragraph("Informe de Governance &amp; Compliance", styles["heading"]))
-    story.append(Paragraph(f"Organización: <b>{_escape_pdf(org_name)}</b>", styles["body"]))
+    story.append(Paragraph(L["report_title"], styles["heading"]))
+    story.append(Paragraph(f"{L['organization']}: <b>{_escape_pdf(org_name)}</b>", styles["body"]))
     if auditor_name.strip():
         role = f" — {_escape_pdf(auditor_role)}" if auditor_role.strip() else ""
-        story.append(Paragraph(f"Responsable: <b>{_escape_pdf(auditor_name)}</b>{role}", styles["body"]))
-    story.append(Paragraph(f"Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["body"]))
+        story.append(Paragraph(f"{L['auditor']}: <b>{_escape_pdf(auditor_name)}</b>{role}", styles["body"]))
+    story.append(Paragraph(f"{L['date']}: {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["body"]))
     if is_demo_mode(conn):
-        story.append(
-            Paragraph(
-                "<b>AVISO:</b> Este informe incluye datos de DEMOSTRACIÓN. "
-                "No es válido para auditorías ni cumplimiento oficial.",
-                styles["body"],
-            )
-        )
+        story.append(Paragraph(L["demo_warning"], styles["body"]))
     story.append(Spacer(1, 0.3 * cm))
 
-    story.append(Paragraph("Resumen de hallazgos detectados", styles["heading"]))
-    story.append(_summary_table(dashboard))
+    story.append(Paragraph(L["findings_summary"], styles["heading"]))
+    story.append(_summary_table(dashboard, L))
     story.append(Spacer(1, 0.4 * cm))
 
     ai_text, ai_err = _resolve_ai_summary(conn, ai_summary, settings)
-    story.append(Paragraph("Análisis ejecutivo IA", styles["heading"]))
+    story.append(Paragraph(L["ai_executive"], styles["heading"]))
     if ai_text:
-        story.append(
-            Paragraph(
-                f"<i>Generado con Ollama · modelo configurado en Norvik</i>",
-                styles["muted"],
-            )
-        )
+        story.append(Paragraph(f"<i>{L['ai_generated']}</i>", styles["muted"]))
         story.append(Spacer(1, 0.15 * cm))
         story.append(Paragraph(_format_ai_for_pdf(ai_text), styles["ai"]))
     else:
-        hint = ai_err or "No hay análisis IA disponible."
-        story.append(
-            Paragraph(
-                f"<i>{_escape_pdf(hint)}. Genera el análisis en Dashboard o Informes antes de exportar, "
-                "o configura Ollama en Configuración.</i>",
-                styles["muted"],
-            )
-        )
+        hint = ai_err or L["ai_unavailable"]
+        story.append(Paragraph(f"<i>{_escape_pdf(hint)}</i>", styles["muted"]))
     story.append(Spacer(1, 0.4 * cm))
 
-    story.append(Paragraph("KPI por framework", styles["heading"]))
+    story.append(Paragraph(L["kpi_framework"], styles["heading"]))
     fw_scores = dashboard.get("framework_scores") or {}
-    kpi_data = [["Framework", "Score (%)", "Controles", "Nivel medio"]]
+    kpi_data = [[L["framework"], L["score_pct"], L["controls"], L["avg_level"]]]
     for code, label in FRAMEWORK_ROWS:
         s = fw_scores.get(code) or {"score": 0, "count": 0, "avg_level": 0}
         kpi_data.append([label, f"{s.get('score', 0)}", str(s.get("count", 0)), f"{s.get('avg_level', 0)}/5"])

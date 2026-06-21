@@ -5,7 +5,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime
 
-from core.database import get_organization_id
+from core.database import get_organization_id, exit_demo_mode_on_real_entry, should_show_demo_ui
 from core.settings import get_setting
 
 NIST_DOMAINS = ["Govern", "Identify", "Protect", "Detect", "Respond", "Recover"]
@@ -455,7 +455,8 @@ def get_dashboard_payload(conn: sqlite3.Connection, framework: str = "ALL") -> d
             "RGPD": compute_framework_score_from_rows(rows, "RGPD"),
         },
         "badge_counts": get_badge_counts_from_rows(rows),
-        "demo_mode": get_setting(conn, "demo_mode", "0") == "1",
+        "demo_mode": should_show_demo_ui(conn),
+        "show_demo_ui": should_show_demo_ui(conn),
     }
 
 
@@ -482,6 +483,7 @@ def save_assessment(
         "UPDATE settings SET value = ? WHERE key = 'last_review'",
         (datetime.now().strftime("%d/%m/%Y %H:%M"),),
     )
+    exit_demo_mode_on_real_entry(conn)
     conn.commit()
 
 
@@ -510,6 +512,7 @@ def save_assessments_batch(conn: sqlite3.Connection, items: list[dict]) -> None:
         "UPDATE settings SET value = ? WHERE key = 'last_review'",
         (datetime.now().strftime("%d/%m/%Y %H:%M"),),
     )
+    exit_demo_mode_on_real_entry(conn)
     conn.commit()
 
 

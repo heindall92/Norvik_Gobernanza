@@ -35,6 +35,7 @@ DEFAULTS: dict[str, str] = {
     "user_website": "",
     "user_avatar": "",
     "demo_mode": "0",
+    "language": "es",
     "edition": "Enterprise Edition",
 }
 

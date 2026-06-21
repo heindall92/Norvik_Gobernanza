@@ -10,13 +10,19 @@ const questionnaireCache = new Map();
 const loadedFrameworks = new Set();
 const loadedPanels = new Set(['dashboard']);
 
-const PANEL_TITLES = {
-  dashboard: 'Governance & Compliance',
-  frameworks: 'Framework',
-  reports: 'Informes y análisis de brechas',
-  ai: 'Asistente IA',
-  settings: 'Configuración',
-};
+function t(key, params) {
+  return window.NorvikI18n?.t(key, params) || key;
+}
+
+function panelTitles() {
+  return window.NorvikI18n?.panelTitles?.() || {
+    dashboard: 'Governance & Compliance',
+    frameworks: 'Framework',
+    reports: 'Informes y análisis de brechas',
+    ai: 'Asistente IA',
+    settings: 'Configuración',
+  };
+}
 
 const FW_PANEL = {
   nist: 'NIST_CSF2',
@@ -681,8 +687,8 @@ function setPanel(panelId) {
     el.classList.toggle('is-active', active);
   });
   document.getElementById('page-title').textContent = panelId === 'frameworks'
-    ? (FRAMEWORK_META[FW_PANEL[currentFrameworkTab]]?.name || PANEL_TITLES.frameworks)
-    : (PANEL_TITLES[panelId] || 'Norvik');
+    ? (FRAMEWORK_META[FW_PANEL[currentFrameworkTab]]?.name || panelTitles().frameworks)
+    : (panelTitles()[panelId] || 'Norvik');
   if (window.NorvikMotion) NorvikMotion.onNavChange(panelId);
 }
 
@@ -708,8 +714,8 @@ function updateOllamaStatus(status) {
   dot.classList.toggle('online', connected);
   const prov = status?.provider === 'cloud' ? 'Cloud' : 'Local';
   label.textContent = connected
-    ? `Ollama: ON (${prov} · ${status.model || 'modelo'})`
-    : 'Ollama: OFF';
+    ? t('ollama.on', { prov, model: status.model || 'model' })
+    : t('ollama.off');
   if (offline) offline.hidden = connected;
   if (aiSend) aiSend.disabled = !connected;
 }
@@ -756,6 +762,7 @@ function collectSettingsPayload() {
   const model = customModel || selectedModel;
   return {
     org_name: document.getElementById('set-org')?.value || '',
+    language: document.getElementById('set-language')?.value || 'es',
     ollama_provider: provider,
     ollama_host: document.getElementById('set-ollama-host')?.value.trim() || 'http://localhost:11434',
     ollama_cloud_key: document.getElementById('set-ollama-cloud-key')?.value.trim() || '',
@@ -769,7 +776,8 @@ function collectSettingsPayload() {
 async function saveSettingsFromForm(showMsg = true) {
   const result = await callBridge('save_settings', JSON.stringify(collectSettingsPayload()));
   if (result.ok) {
-    if (showMsg) showToast('Configuración guardada');
+    if (showMsg) showToast(t('settings.saved'));
+    if (result.settings?.language) NorvikI18n.setLocale(result.settings.language);
     defer(() => refreshDashboard());
     defer(checkOllamaLater);
   } else if (showMsg) {
@@ -849,6 +857,12 @@ function initOllamaSettings() {
   });
   document.getElementById('btn-test-ollama')?.addEventListener('click', testOllamaConnection);
   document.getElementById('btn-load-models')?.addEventListener('click', loadOllamaModels);
+  document.getElementById('set-language')?.addEventListener('change', () => {
+    const lang = document.getElementById('set-language')?.value || 'es';
+    if (window.NorvikI18n) NorvikI18n.setLocale(lang);
+    saveSettingsFromForm(false);
+    setPanel(currentPanel);
+  });
 }
 
 const RISK_LABELS = { critical: 'Crítico', warning: 'Alto', info: 'Medio' };
@@ -868,7 +882,7 @@ function severityMaturityPct(severity) {
 }
 
 function updateDemoUi(data) {
-  const isDemo = !!(data && data.demo_mode);
+  const isDemo = !!(data && (data.show_demo_ui ?? data.demo_mode));
   document.getElementById('demo-badge')?.toggleAttribute('hidden', !isDemo);
   document.getElementById('demo-banner')?.toggleAttribute('hidden', !isDemo);
   document.getElementById('demo-banner-sep')?.toggleAttribute('hidden', !isDemo);
@@ -878,8 +892,8 @@ function updateDemoUi(data) {
 async function loadDemoData() {
   try {
     const result = await callBridge('load_demo_data');
-    if (!result.ok) throw new Error(result.error || 'No se pudieron cargar los datos demo');
-    showToast(result.message || 'Datos de demostración cargados');
+    if (!result.ok) throw new Error(result.error || t('common.error'));
+    showToast(result.message || t('demo.loaded'));
     await refreshDashboard();
   } catch (err) {
     showToast(err.message);
@@ -887,11 +901,11 @@ async function loadDemoData() {
 }
 
 async function clearDemoData() {
-  if (!window.confirm('¿Eliminar todos los datos de demostración? Las evaluaciones reales no se borran.')) return;
+  if (!window.confirm(t('demo.confirmClear'))) return;
   try {
     const result = await callBridge('clear_demo_data');
-    if (!result.ok) throw new Error(result.error || 'No se pudieron eliminar los datos demo');
-    showToast(result.message || 'Datos demo eliminados');
+    if (!result.ok) throw new Error(result.error || t('common.error'));
+    showToast(result.message || t('demo.removed'));
     await refreshDashboard();
   } catch (err) {
     showToast(err.message);
@@ -915,7 +929,11 @@ function renderDashboard(data) {
 
 
   const sub = document.getElementById('dash-header-sub');
-  if (sub) sub.textContent = `Monitoreo de cumplimiento en ${data.org_name || 'su organización'}.`;
+  if (sub) {
+    sub.textContent = data.org_name
+      ? t('dash.complianceSub', { org: data.org_name })
+      : t('dash.complianceSubDefault');
+  }
 
   const score = Math.round(data.global_score || 0);
   const riskLabel = document.getElementById('risk-label');
@@ -926,9 +944,9 @@ function renderDashboard(data) {
   if (incidents) incidents.textContent = data.critical_count ?? data.non_compliant ?? 0;
 
   const lastUp = document.getElementById('dash-last-update');
-  if (lastUp) lastUp.textContent = `Última actualización: ${data.last_review || 'ahora'}`;
+  if (lastUp) lastUp.textContent = t('dash.lastUpdate', { date: data.last_review || '—' });
   const connLabel = document.getElementById('dash-conn-label');
-  if (connLabel) connLabel.textContent = 'Motor de cumplimiento activo';
+  if (connLabel) connLabel.textContent = t('dash.engineActive');
 
   document.getElementById('page-subtitle').textContent = `${data.org_name || 'Organización'} · Score ${score}%`;
 
@@ -1175,7 +1193,7 @@ async function refreshDashboard(showMsg = false) {
     ]);
     if (data.error) throw new Error(data.error);
     renderDashboard(data);
-    if (showMsg) showToast('Dashboard actualizado');
+    if (showMsg) showToast(t('dash.updated'));
   } catch (err) {
     showSyncError(err.message);
   }
@@ -1823,6 +1841,9 @@ async function loadSettings() {
       : (s.ollama_model || 'llama3.2');
     fillOllamaModelSelect([model], model);
     syncOllamaProviderFields();
+    const langEl = document.getElementById('set-language');
+    if (langEl) langEl.value = s.language || 'es';
+    if (window.NorvikI18n) NorvikI18n.setLocale(s.language || 'es');
     NorvikTheme.loadFromSettings(s);
     applyUserProfile(s);
     defer(() => loadOllamaModels());
@@ -2348,7 +2369,12 @@ function initBridge() {
 
 document.addEventListener('DOMContentLoaded', () => {
   try {
+    window.onNorvikLocaleChange = () => {
+      setPanel(currentPanel);
+      if (dashboardData) renderDashboard(dashboardData);
+    };
     injectNorvikIcons();
+    if (window.NorvikI18n) NorvikI18n.applyDom();
     initOllamaSettings();
     if (window.NorvikResponsive) NorvikResponsive.init();
     if (window.NorvikMotion) NorvikMotion.init();

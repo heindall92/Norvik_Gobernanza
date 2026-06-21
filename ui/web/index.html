@@ -48,29 +48,29 @@
           <nav class="norvik-nav norvik-nav--top" aria-label="Navegación principal">
             <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
             <button type="button" class="nav-item is-active" data-panel="dashboard">
-              <span data-icon="dashboard"></span><span>Dashboard</span>
+              <span data-icon="dashboard"></span><span data-i18n="nav.dashboard">Dashboard</span>
             </button>
             <button type="button" class="nav-item" data-panel="frameworks" id="nav-frameworks">
-              <span data-icon="verified"></span><span>Framework</span>
+              <span data-icon="verified"></span><span data-i18n="nav.framework">Framework</span>
             </button>
             <button type="button" class="nav-item" data-panel="reports">
-              <span data-icon="reports"></span><span>Informes PDF</span>
+              <span data-icon="reports"></span><span data-i18n="nav.reports">Informes PDF</span>
             </button>
             <button type="button" class="nav-item" data-panel="ai">
-              <span data-icon="ai"></span><span>Asistente IA</span>
+              <span data-icon="ai"></span><span data-i18n="nav.ai">Asistente IA</span>
             </button>
           </nav>
           <div class="norvik-sidebar-foot">
             <div class="norvik-status foot-text">
               <span class="dot" id="ollama-dot"></span>
-              <span id="ollama-label">Ollama: comprobando...</span>
+              <span id="ollama-label" data-i18n="ollama.checking">Ollama: comprobando...</span>
             </div>
             <div class="sidebar-foot-nav">
               <button type="button" class="nav-item nav-item--foot" data-panel="settings">
-                <span data-icon="settings"></span><span>Configuración</span>
+                <span data-icon="settings"></span><span data-i18n="nav.settings">Configuración</span>
               </button>
               <button type="button" class="nav-item nav-item--foot" id="btn-support">
-                <span data-icon="help"></span><span>Soporte</span>
+                <span data-icon="help"></span><span data-i18n="nav.support">Soporte</span>
               </button>
             </div>
             <div class="sidebar-user" id="sidebar-user" role="button" tabindex="0">
@@ -81,7 +81,7 @@
               </div>
             </div>
             <button type="button" class="btn-collapse" id="btn-collapse">
-              <span class="chevron-wrap" data-icon="chevronLeft"></span><span class="collapse-label">Colapsar</span>
+              <span class="chevron-wrap" data-icon="chevronLeft"></span><span class="collapse-label" data-i18n="nav.collapse">Colapsar</span>
             </button>
           </div>
         </aside>
@@ -92,13 +92,13 @@
               <span data-icon="menu"></span>
             </button>
             <div class="norvik-topbar__title">
-              <span class="demo-badge" id="demo-badge" hidden aria-label="Modo demostración">DEMO</span>
+              <span class="demo-badge" id="demo-badge" hidden aria-label="Modo demostración" data-i18n="demo.badge">DEMO</span>
               <h1 id="page-title">Governance & Compliance</h1>
-              <p id="page-subtitle">Última revisión: —</p>
+              <p id="page-subtitle" data-i18n-static="common.lastReview">Última revisión: —</p>
             </div>
             <div class="topbar-search">
               <span class="topbar-search__icon" data-icon="search"></span>
-              <input type="text" id="global-search" class="topbar-search__input" placeholder="Buscar controles, marcos o dominios..." autocomplete="off" />
+              <input type="text" id="global-search" class="topbar-search__input" data-i18n-placeholder="search.placeholder" placeholder="Buscar controles, marcos o dominios..." autocomplete="off" />
               <div class="search-results" id="search-results" hidden></div>
             </div>
             <div class="norvik-topbar__actions norvik-topbar__actions--compact">
@@ -109,12 +109,12 @@
               </button>
               <div class="notif-panel mica-surface" id="notif-panel" hidden role="dialog" aria-label="Notificaciones">
                 <div class="notif-panel__head">
-                  <h2 class="notif-panel__title">Notificaciones</h2>
-                  <button type="button" class="notif-panel__mark" id="notif-mark-read">Marcar todo como leído</button>
+                  <h2 class="notif-panel__title" data-i18n="notif.title">Notificaciones</h2>
+                  <button type="button" class="notif-panel__mark" id="notif-mark-read" data-i18n="notif.markRead">Marcar todo como leído</button>
                 </div>
                 <div class="notif-panel__scroll" id="notif-list"></div>
                 <div class="notif-panel__foot">
-                  <button type="button" class="notif-panel__view-all" id="notif-view-all">Ver todas las notificaciones</button>
+                  <button type="button" class="notif-panel__view-all" id="notif-view-all" data-i18n="notif.viewAll">Ver todas las notificaciones</button>
                 </div>
               </div>
               </div>
@@ -145,14 +145,14 @@
                       <div class="dash-empty__float dash-empty__float--b"><span data-icon="check"></span></div>
                     </div>
                   </div>
-                  <h2>No hay datos de cumplimiento todavía</h2>
-                  <p>Comience configurando su primer marco normativo o cargue datos de demostración para explorar el dashboard sin evaluaciones reales.</p>
+                  <h2 data-i18n="dash.emptyTitle">No hay datos de cumplimiento todavía</h2>
+                  <p data-i18n="dash.emptyBody">Comience configurando su primer marco normativo o cargue datos de demostración para explorar el dashboard sin evaluaciones reales.</p>
                   <div class="dash-empty__actions">
                     <button type="button" class="ws-btn primary" id="empty-start">
-                      <span data-icon="verified"></span><span>Comenzar evaluación</span>
+                      <span data-icon="verified"></span><span data-i18n="dash.startEval">Comenzar evaluación</span>
                     </button>
                     <button type="button" class="ws-btn" id="empty-import">
-                      <span data-icon="sparkle"></span><span>Cargar datos de demostración</span>
+                      <span data-icon="sparkle"></span><span data-i18n="dash.loadDemo">Cargar datos de demostración</span>
                     </button>
                   </div>
                   <div class="dash-empty__tips">
@@ -187,31 +187,31 @@
               </nav>
               <header class="dash-header">
                 <div class="dash-header__main">
-                  <h2 class="dash-header__title">Panel de cumplimiento</h2>
-                  <p class="dash-header__subtitle" id="dash-header-sub">Monitoreo de cumplimiento entre marcos y vectores de riesgo.</p>
+                  <h2 class="dash-header__title" data-i18n="dash.compliancePanel">Panel de cumplimiento</h2>
+                  <p class="dash-header__subtitle" id="dash-header-sub" data-i18n="dash.complianceSubDefault">Monitoreo de cumplimiento entre marcos y vectores de riesgo.</p>
                   <div class="dash-header__meta">
                     <span class="dash-status" id="dash-conn-status">
                       <span class="dash-status__dot"></span>
-                      <span id="dash-conn-label">Motor de cumplimiento activo</span>
+                      <span id="dash-conn-label" data-i18n="dash.engineActive">Motor de cumplimiento activo</span>
                     </span>
                     <span class="dash-header__sep" aria-hidden="true">·</span>
                     <span class="dash-header__time" id="dash-last-update">Última actualización: —</span>
                     <span class="dash-header__sep demo-banner__sep" id="demo-banner-sep" hidden aria-hidden="true">·</span>
-                    <span class="demo-banner" id="demo-banner" hidden>Datos de demostración — no válidos para auditoría</span>
+                    <span class="demo-banner" id="demo-banner" hidden data-i18n="demo.banner">Datos de demostración — no válidos para auditoría</span>
                   </div>
                 </div>
                 <div class="dash-header__actions">
                   <button type="button" class="ws-btn ws-btn--warn" id="btn-clear-demo" hidden>
-                    <span data-icon="close"></span><span>Quitar demo</span>
+                    <span data-icon="close"></span><span data-i18n="demo.remove">Quitar demo</span>
                   </button>
                   <button type="button" class="ws-btn" id="btn-sync">
-                    <span data-icon="sync"></span><span>Sincronizar</span>
+                    <span data-icon="sync"></span><span data-i18n="dash.sync">Sincronizar</span>
                   </button>
                   <button type="button" class="ws-btn ws-btn--filter" id="dash-btn-filter">
-                    <span data-icon="filter"></span><span id="dash-filter-btn-label">Filtros</span>
+                    <span data-icon="filter"></span><span id="dash-filter-btn-label" data-i18n="dash.filters">Filtros</span>
                   </button>
                   <button type="button" class="ws-btn primary" id="dash-btn-export">
-                    <span data-icon="export"></span><span>Exportar PDF</span>
+                    <span data-icon="export"></span><span data-i18n="dash.exportPdf">Exportar PDF</span>
                   </button>
                 </div>
               </header>
@@ -531,8 +531,21 @@
 
             <div class="norvik-panel" data-panel="settings">
               <div class="glass-box">
-                <h1 style="font-size:22px;font-weight:650;letter-spacing:-.02em;margin-bottom:4px">Configuración</h1>
-                <p class="sub" style="color:var(--ink-3);font-size:13px;margin-bottom:18px">Conexión IA, apariencia y preferencias de Norvik.</p>
+                <h1 style="font-size:22px;font-weight:650;letter-spacing:-.02em;margin-bottom:4px" data-i18n="settings.title">Configuración</h1>
+                <p class="sub" style="color:var(--ink-3);font-size:13px;margin-bottom:18px" data-i18n="settings.languageHint">Interfaz, informes PDF y asistente IA</p>
+
+                <div class="settings-section" id="language-settings">
+                  <div class="label" data-i18n="settings.language">Idioma</div>
+                  <div class="settings-grid">
+                    <div class="setting-field">
+                      <label for="set-language" data-i18n="settings.language">Idioma</label>
+                      <select id="set-language" class="setting-select">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
 
                 <div class="settings-section" id="ollama-settings">
                   <div class="label">Asistente IA (Ollama)</div>
@@ -830,15 +843,15 @@
   <div class="modal-overlay" id="support-modal" hidden>
     <div class="modal-card glass-panel">
       <div class="modal-card__head">
-        <span class="card-head__title"><span class="ai-spark" data-icon="help"></span>Soporte</span>
+        <span class="card-head__title"><span class="ai-spark" data-icon="help"></span><span data-i18n="support.title">Soporte</span></span>
         <button type="button" class="icon-btn" id="support-close" aria-label="Cerrar"><span data-icon="close"></span></button>
       </div>
       <div class="modal-card__body">
-        <p>Norvik es tu plataforma de gobernanza, riesgo y cumplimiento (GRC) para evaluar madurez, priorizar brechas y documentar evidencias bajo NIST CSF 2.0, ISO 27001, CIS Controls v8 y RGPD.</p>
-        <p>Si necesitas ayuda con la configuración, la interpretación de controles o soporte técnico, contacta al administrador de tu organización o consulta la documentación de licencia del producto.</p>
+        <p data-i18n="support.body1">Norvik es tu plataforma de gobernanza, riesgo y cumplimiento (GRC) para evaluar madurez, priorizar brechas y documentar evidencias bajo NIST CSF 2.0, ISO 27001, CIS Controls v8 y RGPD.</p>
+        <p data-i18n="support.body2">Si necesitas ayuda con la configuración, la interpretación de controles o soporte técnico, contacta al administrador de tu organización o consulta la documentación de licencia del producto.</p>
         <div class="support-links">
-          <a class="support-link" href="https://github.com/heindall92/Norvik_Gobernanza/blob/main/COMMERCIAL_LICENSE.md" target="_blank" rel="noopener noreferrer">Licencia comercial · Norvik GRC</a>
-          <a class="support-link" href="https://github.com/heindall92/Norvik_Gobernanza" target="_blank" rel="noopener noreferrer">Documentación · GitHub</a>
+          <a class="support-link" href="https://github.com/heindall92/Norvik_Gobernanza/blob/main/COMMERCIAL_LICENSE.md" target="_blank" rel="noopener noreferrer" data-i18n="support.license">Licencia comercial · Norvik GRC</a>
+          <a class="support-link" href="https://github.com/heindall92/Norvik_Gobernanza" target="_blank" rel="noopener noreferrer" data-i18n="support.docs">Documentación · GitHub</a>
         </div>
         <ul class="support-list">
           <li><strong>Evaluar madurez:</strong> entra en Framework, elige un marco y asigna nivel CMM (L0–L5) a cada control.</li>
@@ -846,7 +859,7 @@
           <li><strong>Asistente IA:</strong> configura Ollama en Configuración para recomendaciones contextualizadas.</li>
           <li><strong>Informes:</strong> genera el PDF ejecutivo desde la sección Informes PDF.</li>
         </ul>
-        <p class="support-meta">Norvik · Enterprise Edition · Documentación en línea</p>
+        <p class="support-meta" data-i18n="support.meta">Norvik · Enterprise Edition · Documentación en línea</p>
       </div>
     </div>
   </div>
@@ -857,6 +870,7 @@
   <script src="theme-engine.js"></script>
   <script src="motion.js"></script>
   <script src="responsive.js"></script>
+  <script src="i18n.js"></script>
   <script src="charts.js"></script>
   <script src="app.js"></script>
 </body>
