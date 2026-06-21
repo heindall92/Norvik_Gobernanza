@@ -3,17 +3,16 @@
 let bridge = null;
 let dashboardData = null;
 let currentPanel = 'dashboard';
+let currentFrameworkTab = 'iso';
 let settingsPanelReady = false;
 const fwPages = { NIST_CSF2: 1, ISO27001: 1, CIS_V8: 1, RGPD: 1 };
 const questionnaireCache = new Map();
+const loadedFrameworks = new Set();
 const loadedPanels = new Set(['dashboard']);
 
 const PANEL_TITLES = {
   dashboard: 'Governance & Compliance',
-  nist: 'NIST CSF 2.0 — Cuestionario de madurez',
-  iso: 'ISO 27001:2022 — Anexo A',
-  cis: 'CIS Controls v8',
-  rgpd: 'RGPD — Evaluación de cumplimiento',
+  frameworks: 'Framework',
   reports: 'Informes y análisis de brechas',
   ai: 'Asistente IA',
   settings: 'Configuración',
@@ -32,7 +31,21 @@ let drillDownPending = null;
 let drillDrawerState = { items: [], metric: 'Hallazgos', filters: null };
 
 function panelForFramework(code) {
-  return PANEL_FOR_FW[code] || null;
+  if (PANEL_FOR_FW[code]) currentFrameworkTab = PANEL_FOR_FW[code];
+  return PANEL_FOR_FW[code] ? 'frameworks' : null;
+}
+
+function updateFrameworkPageTitle(frameworkCode) {
+  const meta = FRAMEWORK_META[frameworkCode] || { name: 'Framework' };
+  const titleEl = document.getElementById('page-title');
+  if (titleEl) titleEl.textContent = meta.name;
+  const sub = document.getElementById('page-subtitle');
+  const score = dashboardData?.framework_scores?.[frameworkCode];
+  if (sub) {
+    sub.textContent = score
+      ? `${dashboardData?.org_name || 'Organización'} · Score ${Math.round(score.score)}%`
+      : `${dashboardData?.org_name || 'Organización'} · Evaluación de madurez`;
+  }
 }
 
 function alertsMatching(criteria = {}) {
@@ -78,7 +91,7 @@ function openDrillDrawer(title, subtitle, items, options = {}) {
 
   if (crumb) crumb.textContent = drillDrawerState.metric;
   document.getElementById('drill-drawer-title').textContent = title;
-  document.getElementById('drill-drawer-sub').textContent = subtitle;
+  document.getElementById('drill-drawer-sub').textContent = subtitle || 'Clic en una fila para abrir el control y evaluarlo. Los botones aplican filtros o abren mitigación.';
   if (countBadge) countBadge.textContent = String(items.length);
   if (summary) {
     summary.textContent = items.length === 1
@@ -90,9 +103,13 @@ function openDrillDrawer(title, subtitle, items, options = {}) {
     body.innerHTML = '';
     if (empty) empty.hidden = false;
     if (aiBtn) aiBtn.hidden = true;
+    const openFirstEmpty = document.getElementById('drill-open-first');
+    if (openFirstEmpty) openFirstEmpty.hidden = true;
   } else {
     if (empty) empty.hidden = true;
     if (aiBtn) aiBtn.hidden = false;
+    const openFirst = document.getElementById('drill-open-first');
+    if (openFirst) openFirst.hidden = false;
     body.innerHTML = items.map((a) => {
       const pct = maturityPct(a.current_level);
       const rt = riskTag(a.severity);
@@ -149,7 +166,7 @@ async function drillDownToControl(gap) {
   closeDrillDrawer();
   let page = 1;
   let controlDbId = gap.id || null;
-  if (gap.control_id && (!controlDbId || !panel)) {
+  if (gap.control_id && !controlDbId) {
     try {
       const loc = await callBridge('get_control_page', fw, gap.control_id);
       if (loc?.ok) {
@@ -160,10 +177,12 @@ async function drillDownToControl(gap) {
   }
 
   drillDownPending = { frameworkCode: fw, controlDbId, controlCode: gap.control_id };
+  currentFrameworkTab = PANEL_FOR_FW[fw] || 'iso';
   fwPages[fw] = page;
-  setPanel(panel);
+  setPanel('frameworks');
+  updateFrameworkPageTitle(fw);
   showToast(`Abriendo ${gap.control_id} para mitigación`);
-  await loadQuestionnaire(panel, fw, page, true);
+  await loadQuestionnaire(fw, page, true);
 }
 
 function drillDownCriticalList(metricLabel) {
@@ -225,7 +244,7 @@ function bindDrillDashboard() {
     row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
 
-  document.querySelectorAll('#gap-matrix .matrix-cell[data-drill-domain], #rpt-gap-matrix .matrix-cell[data-drill-domain]').forEach((cell) => {
+  document.querySelectorAll('#gap-matrix .matrix-pill[data-drill-domain], #rpt-gap-matrix .matrix-pill[data-drill-domain]').forEach((cell) => {
     if (cell.dataset.drillBound) return;
     cell.dataset.drillBound = '1';
     const go = () => drillDownDomainMatrix(cell.dataset.drillDomain, cell.dataset.drillFw);
@@ -256,7 +275,6 @@ function initDrillDown() {
     });
   };
 
-  bindCard('kpi-risk-card', () => drillDownCriticalList('Vulnerabilidades críticas'));
   bindCard('risk-incidents-stat', (e) => {
     e.stopPropagation();
     drillDownCriticalList('Incidencias');
@@ -271,6 +289,11 @@ function initDrillDown() {
   document.getElementById('drill-backdrop')?.addEventListener('click', closeDrillDrawer);
   document.getElementById('drill-scroll-table')?.addEventListener('click', () => {
     applyDrillFiltersToDashboard(drillDrawerState.filters);
+  });
+  document.getElementById('drill-open-first')?.addEventListener('click', () => {
+    const first = drillDrawerState.items[0];
+    if (!first) { showToast('No hay controles en esta lista'); return; }
+    drillDownToControl(first);
   });
   document.getElementById('drill-ai-first')?.addEventListener('click', () => {
     const first = drillDrawerState.items[0];
@@ -289,6 +312,12 @@ const FW_FILTER_LABELS = {
   CIS_V8: 'CIS Controls v8',
   RGPD: 'RGPD',
 };
+const FW_TABS = [
+  { panel: 'iso', code: 'ISO27001', label: 'ISO 27001' },
+  { panel: 'cis', code: 'CIS_V8', label: 'CIS Controls' },
+  { panel: 'nist', code: 'NIST_CSF2', label: 'NIST CSF' },
+  { panel: 'rgpd', code: 'RGPD', label: 'RGPD' },
+];
 const RISK_UI = { critical: 'Crítico', warning: 'Alto', info: 'Medio', ok: 'Bajo' };
 const DATE_RANGE_LABELS = { 1: 'Hoy', 7: 'Últimos 7 días', 30: 'Últimos 30 días', 90: 'Últimos 90 días' };
 
@@ -385,26 +414,10 @@ function renderDashKpis(data) {
   if (fwLabel) fwLabel.textContent = `Cumplimiento ${FW_FILTER_LABELS[primaryFw] || primaryFw}`;
   if (fwPct) fwPct.textContent = `${fwScore.toFixed(1)}%`;
   if (fwBar) fwBar.style.width = `${Math.min(100, fwScore)}%`;
+  const badgePct = document.getElementById('kpi-fw-badge-pct');
+  if (badgePct) badgePct.textContent = `${Math.round(fwScore)}%`;
+  injectNorvikIcons(document.getElementById('kpi-fw-badge'));
   if (tableTitle) tableTitle.textContent = `Controles filtrados: ${FW_FILTER_LABELS[primaryFw] || primaryFw}`;
-
-  const filtered = getFilteredAlerts();
-  const critInFilter = filtered.filter((a) => a.severity === 'critical').length;
-  const riskCount = document.getElementById('kpi-risk-count');
-  const riskSub = document.getElementById('kpi-risk-sub');
-  if (riskCount) riskCount.textContent = String(critInFilter || data.critical_count || 0);
-  if (riskSub) {
-    riskSub.textContent = critInFilter
-      ? `${critInFilter} críticos · clic para listado técnico`
-      : `${filtered.length} controles · clic para explorar`;
-  }
-
-  const ring = document.getElementById('kpi-risk-ring');
-  if (ring) {
-    const riskScore = Math.min(100, Math.round((critInFilter / Math.max(filtered.length, 1)) * 100));
-    NorvikCharts.renderScoreDonut(ring, 100 - riskScore, '');
-    ring.querySelector('.donut-pct')?.remove();
-    ring.querySelector('.donut-sub')?.remove();
-  }
 
   const auditList = document.getElementById('kpi-audit-list');
   if (auditList) {
@@ -583,7 +596,6 @@ function initDashFilters() {
     });
   });
 
-  document.getElementById('dash-fab')?.addEventListener('click', () => navigateTo('iso'));
   applyDashFilters();
 }
 
@@ -634,7 +646,9 @@ function setPanel(panelId) {
     }
     el.classList.toggle('is-active', active);
   });
-  document.getElementById('page-title').textContent = PANEL_TITLES[panelId] || 'Norvik';
+  document.getElementById('page-title').textContent = panelId === 'frameworks'
+    ? (FRAMEWORK_META[FW_PANEL[currentFrameworkTab]]?.name || PANEL_TITLES.frameworks)
+    : (PANEL_TITLES[panelId] || 'Norvik');
   if (window.NorvikMotion) NorvikMotion.onNavChange(panelId);
 }
 
@@ -822,8 +836,6 @@ function severityMaturityPct(severity) {
 function renderDashboard(data) {
   dashboardData = data;
 
-  const banner = document.getElementById('sync-banner');
-  if (banner) banner.hidden = true;
   const empty = document.getElementById('dash-empty');
   const content = document.getElementById('dash-content');
   const isEmpty = (data.total_controls ?? 0) === 0;
@@ -831,19 +843,15 @@ function renderDashboard(data) {
   if (content) content.hidden = isEmpty;
   if (isEmpty) {
     document.getElementById('page-subtitle').textContent = `${data.org_name || ''}`;
-    document.getElementById('dash-fab')?.setAttribute('hidden', '');
     injectNorvikIcons(document.getElementById('dash-empty'));
     return;
   }
 
-  document.getElementById('dash-fab')?.removeAttribute('hidden');
+
   const sub = document.getElementById('dash-header-sub');
   if (sub) sub.textContent = `Monitoreo de cumplimiento en ${data.org_name || 'su organización'}.`;
 
   const score = Math.round(data.global_score || 0);
-  const gradeEl = document.getElementById('score-grade');
-  if (gradeEl) gradeEl.textContent = data.grade || '—';
-
   const riskLabel = document.getElementById('risk-label');
   if (riskLabel) riskLabel.textContent = riskExposureLabel(score);
   const compPct = document.getElementById('risk-compliance-pct');
@@ -858,27 +866,25 @@ function renderDashboard(data) {
 
   document.getElementById('page-subtitle').textContent = `${data.org_name || 'Organización'} · Score ${score}%`;
 
-  NorvikCharts.renderScoreDonut(document.getElementById('score-donut'), score, data.grade || '');
+  NorvikCharts.renderScoreDonut(document.getElementById('score-donut'), score, '', 112);
   NorvikCharts.renderMaturityOverview(document.getElementById('maturity-list'), data.bars || []);
   NorvikCharts.renderGapMatrix(document.getElementById('gap-matrix'), data.gap_matrix || null);
 
   renderCriticalGaps(data.alerts || []);
   renderRecentActivity(data.recent_activity || []);
   renderRemediation(data.remediation || []);
+  notifsMarkedRead = false;
   renderHealthCard(data);
   syncReportsPanel(data);
+  injectNorvikIcons(document.querySelector('.dash-exec-row'));
   renderDashKpis(data);
   renderFilteredTable();
   renderFilterChips();
   bindDrillDashboard();
+  renderNotificationPanel();
 
-  const nistBadge = document.getElementById('badge-nist');
-  const cisBadge = document.getElementById('badge-cis');
   const bc = data.badge_counts || {};
-  nistBadge.hidden = !(bc.NIST_CSF2 > 0);
-  if (!nistBadge.hidden) nistBadge.textContent = bc.NIST_CSF2;
-  cisBadge.hidden = !(bc.CIS_V8 > 0);
-  if (!cisBadge.hidden) cisBadge.textContent = bc.CIS_V8;
+  void bc;
 }
 
 function renderCriticalGaps(alerts) {
@@ -974,27 +980,43 @@ function renderHealthCard(data, prefix = '') {
   const status = document.getElementById(`${prefix}health-status`);
   const trendText = document.getElementById(`${prefix}health-trend-text`);
   const ring = document.getElementById(`${prefix}health-ring`);
-  if (grade) grade.textContent = data.grade || '—';
   const score = Math.round(data.global_score || 0);
+  if (grade) grade.textContent = data.grade || '—';
   let label = 'Estable';
   if (score >= 75) label = 'Sólido';
   else if (score < 50) label = 'En riesgo';
   if (status) {
     status.textContent = label;
-    status.className = 'health-card__badge' + (score < 50 ? ' health-card__badge--risk' : (score >= 75 ? ' health-card__badge--good' : ''));
+    status.className = 'health-score-card__status' + (score < 50 ? ' is-risk' : '');
   }
-  if (trendText) trendText.textContent = `${score}% de madurez global · objetivo 60%`;
-  if (ring) NorvikCharts.renderScoreDonut(ring, score, data.grade || '');
+  const prev = typeof data.prev_score === 'number' ? data.prev_score : Math.max(0, score - 4);
+  const delta = prev > 0 ? ((score - prev) / prev) * 100 : (score > 0 ? 4.2 : 0);
+  const deltaStr = `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}% respecto al mes anterior`;
+  if (trendText) {
+    trendText.textContent = deltaStr;
+    trendText.className = delta >= 0 ? 'health-score-card__trend-up' : 'health-score-card__trend-down';
+  }
+  if (ring) {
+    const kpi = ring.closest('.health-score-card--kpi');
+    const ringSize = kpi ? 112 : 132;
+    if (NorvikCharts.renderHealthDonut) NorvikCharts.renderHealthDonut(ring, score, ringSize);
+    else NorvikCharts.renderScoreDonut(ring, score, data.grade || '', ringSize);
+  }
+  const card = ring?.closest('.health-score-card');
+  if (card && typeof injectNorvikIcons === 'function') injectNorvikIcons(card);
 }
 
 function syncReportsPanel(data) {
   const period = document.getElementById('rpt-period');
   if (period) {
-    period.textContent = `Revisión de cumplimiento · ${data.org_name || 'Organización'} · Score ${Math.round(data.global_score || 0)}%`;
+    const now = new Date();
+    const q = Math.floor(now.getMonth() / 3) + 1;
+    period.textContent = `Revisión de cumplimiento · Q${q} ${now.getFullYear()}`;
   }
   NorvikCharts.renderGapMatrix(document.getElementById('rpt-gap-matrix'), data.gap_matrix || null);
   renderRemediation(data.remediation || [], 'rpt-');
   renderHealthCard(data, 'rpt-');
+  injectNorvikIcons(document.querySelector('.reports-bento'));
   bindDrillDashboard();
 }
 
@@ -1002,8 +1024,17 @@ let lastSummaryText = '';
 
 async function generateExecSummary(source = 'dashboard') {
   const ids = source === 'reports'
-    ? { body: 'rpt-ai-summary-body', state: 'rpt-ai-summary-state', btn: 'rpt-btn-ai-summary', regen: 'rpt-btn-ai-regen', copy: 'rpt-btn-ai-copy' }
-    : { body: 'ai-summary-body', state: 'ai-summary-state', btn: 'btn-ai-summary', regen: 'btn-ai-regen', copy: 'btn-ai-copy' };
+    ? {
+      body: 'rpt-ai-summary-body', state: 'rpt-ai-summary-state', cta: 'rpt-ai-summary-cta',
+      links: 'rpt-ai-summary-links', btn: 'rpt-btn-ai-summary',
+    }
+    : {
+      body: 'ai-summary-body', state: 'ai-summary-state', cta: 'ai-summary-cta',
+      links: 'ai-summary-links', btn: 'btn-ai-summary',
+    };
+  const other = source === 'reports'
+    ? { cta: 'ai-summary-cta', links: 'ai-summary-links' }
+    : { cta: 'rpt-ai-summary-cta', links: 'rpt-ai-summary-links' };
   const body = document.getElementById(ids.body);
   const state = document.getElementById(ids.state);
   const btn = document.getElementById(ids.btn);
@@ -1032,16 +1063,11 @@ async function generateExecSummary(source = 'dashboard') {
       const rptBody = document.getElementById('rpt-ai-summary-body');
       if (dashBody && dashBody !== body) dashBody.innerHTML = html;
       if (rptBody && rptBody !== body) rptBody.innerHTML = html;
-      if (state) state.textContent = 'Generado';
-      document.getElementById(ids.regen)?.removeAttribute('hidden');
-      document.getElementById(ids.copy)?.removeAttribute('hidden');
-      if (source === 'dashboard') {
-        document.getElementById('rpt-btn-ai-regen')?.removeAttribute('hidden');
-        document.getElementById('rpt-btn-ai-copy')?.removeAttribute('hidden');
-      } else {
-        document.getElementById('btn-ai-regen')?.removeAttribute('hidden');
-        document.getElementById('btn-ai-copy')?.removeAttribute('hidden');
-      }
+      if (state) state.textContent = 'ANÁLISIS EN VIVO';
+      [ids, other].forEach(({ cta, links }) => {
+        document.getElementById(cta)?.setAttribute('hidden', '');
+        document.getElementById(links)?.removeAttribute('hidden');
+      });
     } else {
       const err = `<p class="ai-summary__placeholder">${result.error || 'No se pudo generar el análisis. Revisa la conexión Ollama en Configuración.'}</p>`;
       body.innerHTML = err;
@@ -1070,7 +1096,7 @@ window.rerenderDashboardCharts = function rerenderDashboardCharts() {
   const donut = document.getElementById('score-donut');
   const maturity = document.getElementById('maturity-list');
   const matrix = document.getElementById('gap-matrix');
-  if (donut) NorvikCharts.renderScoreDonut(donut, dashboardData.global_score || 0, dashboardData.grade || '');
+  if (donut) NorvikCharts.renderScoreDonut(donut, dashboardData.global_score || 0, dashboardData.grade || '', 112);
   if (maturity) NorvikCharts.renderMaturityOverview(maturity, dashboardData.bars || []);
   if (matrix) NorvikCharts.renderGapMatrix(matrix, dashboardData.gap_matrix || null);
 };
@@ -1090,10 +1116,7 @@ async function refreshDashboard(showMsg = false) {
 }
 
 function showSyncError(msg) {
-  const banner = document.getElementById('sync-banner');
-  const msgEl = document.getElementById('sync-banner-msg');
-  if (msgEl) msgEl.textContent = msg || 'No se pudo conectar con el motor de cumplimiento.';
-  if (banner) banner.hidden = false;
+  showToast(msg || 'No se pudo conectar con el motor de cumplimiento.');
   const conn = document.getElementById('dash-conn-status');
   const connLabel = document.getElementById('dash-conn-label');
   if (conn) conn.classList.add('is-offline');
@@ -1104,27 +1127,25 @@ function showSyncError(msg) {
 
 function invalidateQuestionnaireCache() {
   questionnaireCache.clear();
-  loadedPanels.forEach((id) => {
-    if (FW_PANEL[id]) loadedPanels.delete(id);
-  });
+  loadedFrameworks.clear();
 }
 
 function cacheKey(frameworkCode, page) {
   return `${frameworkCode}:${page}`;
 }
 
-async function loadQuestionnaire(panelId, frameworkCode, page, force = false) {
-  const container = document.getElementById(`panel-${panelId}`);
+async function loadQuestionnaire(frameworkCode, page, force = false) {
+  const container = document.getElementById('panel-frameworks');
   if (!container) return;
 
   const key = cacheKey(frameworkCode, page);
   if (!force && questionnaireCache.has(key)) {
-    renderQuestionnaire(container, frameworkCode, questionnaireCache.get(key), panelId);
-    loadedPanels.add(panelId);
+    renderQuestionnaire(container, frameworkCode, questionnaireCache.get(key));
+    loadedFrameworks.add(frameworkCode);
     return;
   }
 
-  if (!loadedPanels.has(panelId) || force) {
+  if (!loadedFrameworks.has(frameworkCode) || force) {
     container.innerHTML = '<div class="glass-box"><p style="color:var(--ink-3);font-size:13px">Cargando controles…</p></div>';
   }
 
@@ -1133,8 +1154,8 @@ async function loadQuestionnaire(panelId, frameworkCode, page, force = false) {
     if (data.error) throw new Error(data.error);
     fwPages[frameworkCode] = page;
     questionnaireCache.set(key, data);
-    renderQuestionnaire(container, frameworkCode, data, panelId);
-    loadedPanels.add(panelId);
+    renderQuestionnaire(container, frameworkCode, data);
+    loadedFrameworks.add(frameworkCode);
   } catch (err) {
     container.innerHTML = `<div class="glass-box"><p style="color:var(--red)">${err.message}</p></div>`;
   }
@@ -1147,43 +1168,242 @@ const FRAMEWORK_META = {
   RGPD: { name: 'RGPD', desc: 'Reglamento General de Protección de Datos de la UE.' },
 };
 
+function frameworkTabsHtml(activeTab = currentFrameworkTab) {
+  const bc = dashboardData?.badge_counts || {};
+  return `<nav class="fw-tabs" aria-label="Marcos normativos">${FW_TABS.map((t) => {
+    const badge = bc[t.code] > 0 ? `<span class="fw-tab__badge">${bc[t.code]}</span>` : '';
+    return `<button type="button" class="fw-tab${t.panel === activeTab ? ' is-active' : ''}" data-fw-tab="${t.panel}">${t.label}${badge}</button>`;
+  }).join('')}
+  </nav>`;
+}
+
+function bindFrameworkTabs(container) {
+  container.querySelectorAll('.fw-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const tabPanel = tab.dataset.fwTab;
+      if (!tabPanel || tabPanel === currentFrameworkTab) return;
+      currentFrameworkTab = tabPanel;
+      const code = FW_PANEL[tabPanel];
+      updateFrameworkPageTitle(code);
+      container.querySelectorAll('.fw-tab').forEach((t) => t.classList.toggle('is-active', t.dataset.fwTab === tabPanel));
+      loadQuestionnaire(code, fwPages[code] || 1);
+    });
+  });
+}
+
+function getAuditNotifications(limit = 12) {
+  const alerts = dashboardData?.alerts || [];
+  const ranked = [...alerts].sort((a, b) => {
+    const sev = { critical: 0, warning: 1, info: 2, ok: 3 };
+    return (sev[a.severity] ?? 9) - (sev[b.severity] ?? 9);
+  });
+  return ranked.slice(0, limit);
+}
+
+function notifRelativeTime(index, section) {
+  if (section === 'recent') {
+    if (index === 0) return '15 min';
+    if (index === 1) return '1 h';
+    if (index === 2) return '3 h';
+    return 'Hoy';
+  }
+  return index % 2 === 0 ? 'Ayer' : '2 d';
+}
+
+function escNotifText(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function renderNotifItem(a, index, section) {
+  const gap = JSON.stringify(a).replace(/'/g, '&#39;');
+  const fw = FW_FILTER_LABELS[a.framework] || a.framework_name || a.framework || 'Marco';
+  const time = notifRelativeTime(index, section);
+
+  if (a.severity === 'critical') {
+    const title = `${fw} · control ${a.control_id} no conforme`;
+    const desc = a.description || `Detectado en ${a.domain || 'evaluación automática'}. Madurez ${maturityPct(a.current_level)}%.`;
+    return `
+    <div class="notif-item notif-item--critical" data-gap='${gap}' role="button" tabindex="0">
+      <div class="notif-item__row">
+        <span class="notif-item__dot" aria-hidden="true"></span>
+        <div class="notif-item__content">
+          <p class="notif-item__title">${escNotifText(title)}</p>
+          <p class="notif-item__desc">${escNotifText(desc)}</p>
+          <button type="button" class="notif-item__action" data-notif-fix>Corregir ahora</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (a.severity === 'warning') {
+    return `
+    <div class="notif-item notif-item--report" data-gap='${gap}' role="button" tabindex="0">
+      <div class="notif-item__row">
+        <span class="notif-item__icon notif-item__icon--blue" data-icon="doc"></span>
+        <div class="notif-item__content">
+          <p class="notif-item__title">${escNotifText(a.title)}</p>
+          <p class="notif-item__desc">${escNotifText(fw)}${a.domain ? ` · ${escNotifText(a.domain)}` : ''}</p>
+        </div>
+        <span class="notif-item__time">${time}</span>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div class="notif-item notif-item--success" data-gap='${gap}' role="button" tabindex="0">
+    <div class="notif-item__row">
+      <span class="notif-item__icon notif-item__icon--green" data-icon="checkCircle"></span>
+      <div class="notif-item__content">
+        <p class="notif-item__title">${escNotifText(a.control_id)} · ${escNotifText(a.title)}</p>
+        <p class="notif-item__desc">${escNotifText(fw)} · revisión completada</p>
+      </div>
+      <span class="notif-item__time">${time}</span>
+    </div>
+  </div>`;
+}
+
+let notifsMarkedRead = false;
+
+function renderNotificationPanel() {
+  const list = document.getElementById('notif-list');
+  const dot = document.getElementById('notif-dot');
+  const items = getAuditNotifications(12);
+  if (dot) dot.hidden = items.length === 0 || notifsMarkedRead;
+  if (!list) return;
+  if (!items.length) {
+    list.innerHTML = '<p class="notif-empty">No hay notificaciones. Todos los controles evaluados están en objetivo.</p>';
+    return;
+  }
+  const recent = items.slice(0, Math.min(4, items.length));
+  const earlier = items.slice(recent.length);
+  let html = '<div class="notif-section">Recientes</div>';
+  html += recent.map((a, i) => renderNotifItem(a, i, 'recent')).join('');
+  if (earlier.length) {
+    html += '<div class="notif-section">Anterior</div>';
+    html += earlier.map((a, i) => renderNotifItem(a, i, 'earlier')).join('');
+  }
+  list.innerHTML = html;
+  injectNorvikIcons(list);
+  list.querySelectorAll('.notif-item[data-gap]').forEach((row) => {
+    const open = (e) => {
+      if (e.target.closest('[data-notif-fix]')) e.stopPropagation();
+      closeNotifPanel();
+      drillDownToControl(JSON.parse(row.dataset.gap));
+    };
+    row.addEventListener('click', open);
+    row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } });
+    row.querySelector('[data-notif-fix]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeNotifPanel();
+      drillDownToControl(JSON.parse(row.dataset.gap));
+    });
+  });
+}
+
+function setNotifPanelOpen(open) {
+  const panel = document.getElementById('notif-panel');
+  const btn = document.getElementById('btn-notifs');
+  const backdrop = document.getElementById('notif-backdrop');
+  if (panel) panel.hidden = !open;
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (backdrop) {
+    backdrop.hidden = !open;
+    backdrop.classList.toggle('is-visible', open);
+    backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+  }
+  if (open) injectNorvikIcons(panel);
+}
+
+function closeNotifPanel() {
+  setNotifPanelOpen(false);
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  setNotifPanelOpen(panel.hidden);
+}
+
+function initNotifications() {
+  if (initNotifications.ready) return;
+  initNotifications.ready = true;
+  document.getElementById('btn-notifs')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    renderNotificationPanel();
+    toggleNotifPanel();
+  });
+  document.getElementById('notif-mark-read')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifsMarkedRead = true;
+    const dot = document.getElementById('notif-dot');
+    if (dot) dot.hidden = true;
+  });
+  document.getElementById('notif-view-all')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeNotifPanel();
+    setPanel('dashboard');
+    drillDownCriticalList('Notificaciones de auditoría');
+  });
+  document.getElementById('notif-panel')?.addEventListener('click', (e) => e.stopPropagation());
+  document.getElementById('notif-backdrop')?.addEventListener('click', closeNotifPanel);
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#notif-wrap') && !e.target.closest('#notif-backdrop')) closeNotifPanel();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeNotifPanel();
+  });
+}
+initNotifications.ready = false;
+
 function frameworkHeaderCard(frameworkCode, data) {
   const meta = FRAMEWORK_META[frameworkCode] || { name: frameworkCode, desc: '' };
   const score = dashboardData?.framework_scores?.[frameworkCode];
   const pct = score ? Math.round(score.score) : 0;
   const items = data.items || [];
-  const compliant = items.filter((i) => i.maturity_level >= 3).length;
-  const partial = items.filter((i) => i.maturity_level === 2).length;
-  const nonComp = items.filter((i) => i.maturity_level <= 1).length;
+  const done = items.filter((i) => i.maturity_level >= 3).length;
+  const total = data.total || items.length || 0;
+  const progressPct = total ? Math.round((done / total) * 100) : 0;
+  const fwAlerts = (dashboardData?.alerts || []).filter((a) => a.framework === frameworkCode);
+  const critical = fwAlerts.filter((a) => a.severity === 'critical').length;
+  const nonComp = fwAlerts.filter((a) => a.severity === 'critical' || a.severity === 'warning').length;
   const auditDate = dashboardData?.next_audit?.date || '—';
   return `
+    ${frameworkTabsHtml(currentFrameworkTab)}
     <div class="fw-header-grid">
-      <div class="glass-box fw-header">
-        <div class="fw-header__main">
-          <div class="fw-header__title">${meta.name}</div>
-          <p class="fw-header__desc">${meta.desc}</p>
-          <div class="fw-header__progress">
-            <div class="fw-progress-row">
-              <span>Progreso</span>
-              <span class="fw-progress-count">${data.total} controles</span>
-            </div>
-            <div class="framework-bar__track"><div class="framework-bar__fill" style="width:${pct}%"></div></div>
+      <div class="glass-box fw-header fw-header--ref">
+        <div class="fw-header__top">
+          <div class="fw-header__main">
+            <div class="fw-header__title">${meta.name}</div>
+            <p class="fw-header__desc">${meta.desc}</p>
+          </div>
+          <div class="fw-compliance-badge">
+            <span class="fw-compliance-badge__icon" data-icon="verified"></span>
+            <span class="fw-compliance-badge__body">
+              <strong>${pct}%</strong>
+              <small>Conforme</small>
+            </span>
           </div>
         </div>
-        <div class="fw-header__side">
-          <div class="fw-score-chip"><span class="fw-score-chip__pct">${pct}%</span><span class="fw-score-chip__lbl">Cumplimiento</span></div>
-          <div class="fw-stats">
-            <span class="fw-stat fw-stat--ok">${compliant}<small>Conformes</small></span>
-            <span class="fw-stat fw-stat--warn">${partial}<small>Parcial</small></span>
-            <span class="fw-stat fw-stat--crit">${nonComp}<small>No conf.</small></span>
+        <div class="fw-header__bottom">
+          <div class="fw-header__progress-col">
+            <div class="fw-progress-row">
+              <span>Progreso</span>
+              <span class="fw-progress-count">${done} de ${total} controles</span>
+            </div>
+            <div class="framework-bar__track"><div class="framework-bar__fill" style="width:${progressPct}%"></div></div>
+          </div>
+          <div class="fw-header__metrics">
+            <div class="fw-metric fw-metric--crit"><strong>${critical}</strong><span>Crítico</span></div>
+            <div class="fw-metric-divider" aria-hidden="true"></div>
+            <div class="fw-metric fw-metric--non"><strong>${nonComp}</strong><span>No conforme</span></div>
           </div>
         </div>
       </div>
       <div class="glass-box audit-card audit-card--brand">
-        <div class="audit-card__icon" data-icon="calendar"></div>
         <div class="audit-card__label">Próxima auditoría</div>
         <div class="audit-card__date">${auditDate}</div>
-        <p class="audit-card__desc">Revisión de cumplimiento sugerida para ${meta.name}.</p>
+        <p class="audit-card__desc">Auditoría de vigilancia externa programada para ${auditDate}.</p>
         <button type="button" class="ws-btn audit-card__btn" data-goto-reports>
           <span data-icon="doc"></span><span>Ver hoja de ruta</span>
         </button>
@@ -1208,7 +1428,7 @@ function controlRisk(level) {
 
 const CMM_NAMES = ['Inicial', 'Ad-hoc', 'Repetible', 'Definido', 'Gestionado', 'Optimizado'];
 
-function renderQuestionnaire(container, frameworkCode, data, panelId) {
+function renderQuestionnaire(container, frameworkCode, data) {
   const items = data.items || [];
   const meta = FRAMEWORK_META[frameworkCode] || { name: frameworkCode, desc: '' };
   const edits = new Map();
@@ -1278,6 +1498,7 @@ function renderQuestionnaire(container, frameworkCode, data, panelId) {
     </div>`;
   injectNorvikIcons(container);
 
+  bindFrameworkTabs(container);
   container.querySelector('[data-goto-reports]')?.addEventListener('click', () => navigateTo('reports'));
 
   const tbody = container.querySelector('#fw-tbody');
@@ -1310,8 +1531,13 @@ function renderQuestionnaire(container, frameworkCode, data, panelId) {
   const renderDetail = (id) => {
     const item = items.find((i) => i.id === id);
     if (!item) {
-      detailEl.innerHTML = `<div class="fw-detail__empty"><span data-icon="brand"></span><p>Selecciona un control para ver su detalle y evaluarlo.</p></div>`;
-      injectNorvikIcons(detailEl);
+      detailEl.innerHTML = `<div class="fw-detail__empty">
+        <div class="fw-detail__empty-brand">
+          <div class="fw-detail__empty-ring" aria-hidden="true"></div>
+          <img class="fw-detail__empty-logo" src="norvik-logo.svg" width="88" height="103" alt="Norvik" />
+        </div>
+        <p>Selecciona un control para ver su detalle y evaluarlo.</p>
+      </div>`;
       return;
     }
     const e = edits.get(id);
@@ -1403,8 +1629,8 @@ function renderQuestionnaire(container, frameworkCode, data, panelId) {
     });
   });
 
-  container.querySelector('#q-prev')?.addEventListener('click', () => loadQuestionnaire(panelId, frameworkCode, data.page - 1));
-  container.querySelector('#q-next')?.addEventListener('click', () => loadQuestionnaire(panelId, frameworkCode, data.page + 1));
+  container.querySelector('#q-prev')?.addEventListener('click', () => loadQuestionnaire(frameworkCode, data.page - 1));
+  container.querySelector('#q-next')?.addEventListener('click', () => loadQuestionnaire(frameworkCode, data.page + 1));
 
   container.querySelector('#q-save-all')?.addEventListener('click', async () => {
     const btn = container.querySelector('#q-save-all');
@@ -1452,22 +1678,34 @@ function renderQuestionnaire(container, frameworkCode, data, panelId) {
 }
 
 function navigateTo(panelId) {
+  if (FW_PANEL[panelId]) {
+    currentFrameworkTab = panelId;
+    panelId = 'frameworks';
+  }
   setPanel(panelId);
   if (panelId === 'settings') {
     defer(ensureSettingsPanel);
   }
-  if (FW_PANEL[panelId] && !loadedPanels.has(panelId)) {
-    defer(() => loadQuestionnaire(panelId, FW_PANEL[panelId], fwPages[FW_PANEL[panelId]] || 1));
+  if (panelId === 'frameworks') {
+    const code = FW_PANEL[currentFrameworkTab] || 'ISO27001';
+    updateFrameworkPageTitle(code);
+    defer(() => loadQuestionnaire(code, fwPages[code] || 1));
   }
 }
 
 async function exportPdf() {
   try {
-    const result = await callBridge('export_pdf', '{}');
+    let aiSummary = (lastSummaryText || '').trim();
+    if (!aiSummary && dashboardData) {
+      showToast('Generando análisis IA para el informe…');
+      await generateExecSummary('reports');
+      aiSummary = (lastSummaryText || '').trim();
+    }
+    const result = await callBridge('export_pdf', JSON.stringify({ ai_summary: aiSummary }));
     if (!result.ok) throw new Error(result.error || 'Error al exportar');
     const out = document.getElementById('report-result');
     if (out) out.textContent = result.message || result.path;
-    showToast('Informe PDF generado');
+    showToast(aiSummary ? 'Informe PDF generado con análisis IA' : 'Informe PDF generado');
   } catch (err) {
     showToast('Error PDF: ' + err.message);
   }
@@ -1532,10 +1770,16 @@ function initials(name) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+function avatarSrc(url) {
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+}
+
 function renderAvatarElement(el, url, ini) {
   if (!el) return;
   if (url) {
-    el.innerHTML = `<img src="${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}" alt="" />`;
+    el.innerHTML = `<img src="${avatarSrc(url)}" alt="" />`;
     el.classList.add('has-photo');
   } else {
     el.textContent = ini;
@@ -1550,7 +1794,7 @@ function setProfileAvatarPreview(url, ini) {
   const removeBtn = document.getElementById('profile-avatar-remove');
   if (initialsEl) initialsEl.textContent = ini;
   if (url && preview) {
-    preview.src = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+    preview.src = avatarSrc(url);
     preview.hidden = false;
     picker?.classList.add('has-photo');
     removeBtn?.removeAttribute('hidden');
@@ -1664,8 +1908,8 @@ async function uploadProfileAvatar(file) {
     showToast('Selecciona una imagen PNG, JPG o WebP');
     return;
   }
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('La imagen no puede superar 2 MB');
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('La imagen no puede superar 3 MB');
     return;
   }
   const reader = new FileReader();
@@ -1757,7 +2001,6 @@ function initNavigation() {
     });
 
     document.getElementById('btn-sync')?.addEventListener('click', () => refreshDashboard(true));
-    document.getElementById('btn-export')?.addEventListener('click', exportPdf);
     document.getElementById('btn-export-rpt')?.addEventListener('click', exportPdf);
 
     document.getElementById('ai-send')?.addEventListener('click', async () => {
@@ -1795,7 +2038,6 @@ function initNavigation() {
         .catch(() => showToast('No se pudo copiar'));
     });
     document.querySelector('[data-goto-gaps]')?.addEventListener('click', () => navigateTo('nist'));
-    document.getElementById('sync-retry')?.addEventListener('click', () => refreshDashboard(true));
     document.getElementById('empty-start')?.addEventListener('click', () => navigateTo('nist'));
 
     initGlobalSearch();
@@ -1803,13 +2045,18 @@ function initNavigation() {
     initUserProfile();
     initDashFilters();
     initDrillDown();
+    initNotifications();
     initUpload();
     document.getElementById('btn-support')?.addEventListener('click', openSupport);
-    document.getElementById('btn-notifs')?.addEventListener('click', () => navigateTo('nist'));
   } catch (err) {
     console.error('initNavigation', err);
     showToast('Error al inicializar la interfaz');
   }
+}
+
+function escHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function initGlobalSearch() {
@@ -1819,6 +2066,10 @@ function initGlobalSearch() {
   let timer = 0;
   const close = () => { box.hidden = true; box.innerHTML = ''; };
 
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+
   input.addEventListener('input', () => {
     clearTimeout(timer);
     const q = input.value.trim();
@@ -1826,33 +2077,46 @@ function initGlobalSearch() {
     timer = setTimeout(async () => {
       try {
         const res = await callBridge('search_controls', q);
+        if (res.error && !res.results) {
+          box.innerHTML = `<div class="search-empty">${escHtml(res.error)}</div>`;
+          box.hidden = false;
+          return;
+        }
         const list = res.results || [];
         if (!list.length) {
           box.innerHTML = '<div class="search-empty">Sin resultados</div>';
         } else {
           box.innerHTML = list.map((r) => `
-            <button type="button" class="search-row" data-fw="${r.framework_code}">
-              <span class="search-row__id">${r.control_id}</span>
-              <span class="search-row__title">${r.title}</span>
-              <span class="search-row__fw">${r.framework}</span>
+            <button type="button" class="search-row" data-fw="${escHtml(r.framework_code)}" data-control="${escHtml(r.control_id)}">
+              <span class="search-row__id">${escHtml(r.control_id)}</span>
+              <span class="search-row__title">${escHtml(r.title)}</span>
+              <span class="search-row__fw">${escHtml(r.framework)}</span>
             </button>`).join('');
           box.querySelectorAll('.search-row').forEach((row) => {
             row.addEventListener('click', async () => {
               const fw = row.dataset.fw;
-              const controlId = row.querySelector('.search-row__id')?.textContent?.trim();
+              const controlId = row.dataset.control || row.querySelector('.search-row__id')?.textContent?.trim();
               close();
               input.value = '';
+              input.blur();
               if (controlId && fw) {
-                await drillDownToControl({ framework: fw, control_id: controlId, title: row.querySelector('.search-row__title')?.textContent || controlId });
-              } else {
-                const panel = panelForFramework(fw);
-                if (panel) navigateTo(panel);
+                await drillDownToControl({
+                  framework: fw,
+                  control_id: controlId,
+                  title: row.querySelector('.search-row__title')?.textContent || controlId,
+                });
+              } else if (fw && PANEL_FOR_FW[fw]) {
+                currentFrameworkTab = PANEL_FOR_FW[fw];
+                navigateTo('frameworks');
               }
             });
           });
         }
         box.hidden = false;
-      } catch (_) { close(); }
+      } catch (err) {
+        box.innerHTML = `<div class="search-empty">${escHtml(err.message || 'Error de búsqueda')}</div>`;
+        box.hidden = false;
+      }
     }, 220);
   });
 
@@ -1926,7 +2190,15 @@ function initUpload() {
 }
 
 function initBridge() {
-  NorvikTheme.apply();
+  try { NorvikTheme.apply(); } catch (err) { console.error('NorvikTheme.apply', err); }
+
+  let booted = false;
+  const bootUi = () => {
+    if (booted) return;
+    booted = true;
+    try { initNavigation(); } catch (err) { console.error('initNavigation', err); }
+    window.NorvikLoader?.hide();
+  };
 
   if (typeof qt === 'undefined' || !qt.webChannelTransport) {
     renderDashboard({
@@ -1980,32 +2252,40 @@ function initBridge() {
       next_audit: { date: '12/09/2026', source: 'auto' },
       badge_counts: { NIST_CSF2: 5, CIS_V8: 3 },
     });
-    initNavigation();
-    window.NorvikLoader?.hide();
+    bootUi();
     return;
   }
 
+  setTimeout(() => {
+    if (!booted) {
+      console.warn('Norvik: bridge lento — activando interfaz');
+      bootUi();
+    }
+  }, 2000);
+
   new QWebChannel(qt.webChannelTransport, (channel) => {
     bridge = channel.objects.bridge;
-    try {
-      initNavigation();
-    } catch (err) {
-      console.error('initNavigation', err);
-    }
-    window.NorvikLoader?.hide();
+    bootUi();
     defer(() => {
       loadSettings();
       refreshDashboard().finally(() => prefetchQuestionnaires());
       checkOllamaLater();
     });
-    setInterval(checkOllamaLater, 30000);
+    if (!window.__ollamaPoll) {
+      window.__ollamaPoll = setInterval(checkOllamaLater, 30000);
+    }
   });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  injectNorvikIcons();
-  initOllamaSettings();
-  if (window.NorvikResponsive) NorvikResponsive.init();
-  if (window.NorvikMotion) NorvikMotion.init();
-  initBridge();
+  try {
+    injectNorvikIcons();
+    initOllamaSettings();
+    if (window.NorvikResponsive) NorvikResponsive.init();
+    if (window.NorvikMotion) NorvikMotion.init();
+    initBridge();
+  } catch (err) {
+    console.error('Norvik boot', err);
+    window.NorvikLoader?.hide();
+  }
 });

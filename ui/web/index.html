@@ -41,34 +41,17 @@
 
   <div class="app-root">
     <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+    <div class="notif-backdrop" id="notif-backdrop" hidden aria-hidden="true"></div>
     <div class="glass-panel norvik-shell">
       <div class="norvik-layout" id="layout">
         <aside class="norvik-sidebar">
-          <div class="norvik-brand">
-            <img class="norvik-brand-logo" src="norvik-logo.png" width="120" height="36" alt="Norvik" />
-            <div class="norvik-brand-text">
-              <span class="norvik-brand-name">Norvik</span>
-              <span class="norvik-brand-ver" id="brand-edition">Enterprise Edition</span>
-            </div>
-          </div>
-          <nav class="norvik-nav" aria-label="Navegación principal">
+          <nav class="norvik-nav norvik-nav--top" aria-label="Navegación principal">
             <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
             <button type="button" class="nav-item is-active" data-panel="dashboard">
               <span data-icon="dashboard"></span><span>Dashboard</span>
             </button>
-            <button type="button" class="nav-item alerts" data-panel="nist" data-fw="NIST_CSF2">
-              <span data-icon="nist"></span><span>NIST CSF 2.0</span>
-              <span class="badge" id="badge-nist" hidden>0</span>
-            </button>
-            <button type="button" class="nav-item" data-panel="iso" data-fw="ISO27001">
-              <span data-icon="iso"></span><span>ISO 27001:2022</span>
-            </button>
-            <button type="button" class="nav-item alerts" data-panel="cis" data-fw="CIS_V8">
-              <span data-icon="cis"></span><span>CIS Controls v8</span>
-              <span class="badge" id="badge-cis" hidden>0</span>
-            </button>
-            <button type="button" class="nav-item" data-panel="rgpd" data-fw="RGPD">
-              <span data-icon="rgpd"></span><span>RGPD</span>
+            <button type="button" class="nav-item" data-panel="frameworks" id="nav-frameworks">
+              <span data-icon="verified"></span><span>Framework</span>
             </button>
             <button type="button" class="nav-item" data-panel="reports">
               <span data-icon="reports"></span><span>Informes PDF</span>
@@ -117,17 +100,23 @@
               <input type="text" id="global-search" class="topbar-search__input" placeholder="Buscar controles, marcos o dominios..." autocomplete="off" />
               <div class="search-results" id="search-results" hidden></div>
             </div>
-            <div class="norvik-topbar__actions">
-              <button type="button" class="ws-btn" id="btn-sync">
-                <span data-icon="sync"></span><span class="ws-btn__label">Sincronizar</span>
-              </button>
-              <button type="button" class="ws-btn primary" id="btn-export">
-                <span data-icon="export"></span><span class="ws-btn__label">Exportar PDF</span>
-              </button>
-              <button type="button" class="icon-btn" id="btn-notifs" aria-label="Notificaciones">
-                <span data-icon="alerts"></span>
+            <div class="norvik-topbar__actions norvik-topbar__actions--compact">
+              <div class="notif-wrap" id="notif-wrap">
+              <button type="button" class="icon-btn" id="btn-notifs" aria-label="Notificaciones" aria-expanded="false" aria-controls="notif-panel">
+                <span data-icon="bell"></span>
                 <span class="icon-btn__dot" id="notif-dot" hidden></span>
               </button>
+              <div class="notif-panel mica-surface" id="notif-panel" hidden role="dialog" aria-label="Notificaciones">
+                <div class="notif-panel__head">
+                  <h2 class="notif-panel__title">Notificaciones</h2>
+                  <button type="button" class="notif-panel__mark" id="notif-mark-read">Marcar todo como leído</button>
+                </div>
+                <div class="notif-panel__scroll" id="notif-list"></div>
+                <div class="notif-panel__foot">
+                  <button type="button" class="notif-panel__view-all" id="notif-view-all">Ver todas las notificaciones</button>
+                </div>
+              </div>
+              </div>
               <div class="user-chip" id="user-chip" role="button" tabindex="0">
                 <span class="user-chip__avatar" id="user-avatar">RC</span>
                 <span class="user-chip__meta">
@@ -140,15 +129,6 @@
 
           <div class="norvik-work">
             <div class="norvik-panel is-active" data-panel="dashboard">
-              <div class="sync-banner" id="sync-banner" hidden>
-                <span class="sync-banner__icon" data-icon="warning"></span>
-                <div class="sync-banner__body">
-                  <strong>Fallo de sincronización</strong>
-                  <span id="sync-banner-msg">No se pudo conectar con el motor de cumplimiento.</span>
-                </div>
-                <button type="button" class="ws-btn" id="sync-retry"><span data-icon="sync"></span><span>Reintentar</span></button>
-              </div>
-
               <div class="dash-empty" id="dash-empty" hidden>
                 <nav class="dash-crumb dash-crumb--empty" aria-label="Miga de pan">
                   <span>Inicio</span>
@@ -218,11 +198,14 @@
                   </div>
                 </div>
                 <div class="dash-header__actions">
+                  <button type="button" class="ws-btn" id="btn-sync">
+                    <span data-icon="sync"></span><span>Sincronizar</span>
+                  </button>
                   <button type="button" class="ws-btn ws-btn--filter" id="dash-btn-filter">
                     <span data-icon="filter"></span><span id="dash-filter-btn-label">Filtros</span>
                   </button>
-                  <button type="button" class="ws-btn" id="dash-btn-export">
-                    <span data-icon="download"></span><span>Exportar</span>
+                  <button type="button" class="ws-btn primary" id="dash-btn-export">
+                    <span data-icon="export"></span><span>Exportar PDF</span>
                   </button>
                 </div>
               </header>
@@ -233,48 +216,15 @@
                 <button type="button" class="link-btn" id="dash-clear-filters">Limpiar todo</button>
               </div>
 
-              <div class="bento-grid dash-kpi-row">
-                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface drill-target" id="kpi-fw-card" role="button" tabindex="0" title="Ver controles del marco seleccionado">
-                  <div class="dash-kpi__head">
-                    <span class="dash-kpi__label" id="kpi-fw-label">Cumplimiento ISO 27001</span>
-                    <span class="dash-kpi__icon" data-icon="verified"></span>
-                  </div>
-                  <div class="dash-kpi__value-row">
-                    <span class="dash-kpi__value" id="kpi-fw-pct">—</span>
-                    <span class="dash-kpi__delta dash-kpi__delta--down" id="kpi-fw-delta" hidden>
-                      <span data-icon="warning"></span><span>—</span>
-                    </span>
-                  </div>
-                  <div class="dash-kpi__track"><span id="kpi-fw-bar" style="width:0"></span></div>
-                  <p class="dash-kpi__hint" id="kpi-fw-target">Objetivo: 95% de madurez · Clic para detalle</p>
-                </div>
-                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface drill-target drill-target--risk" id="kpi-risk-card" role="button" tabindex="0" title="Ver listado técnico de hallazgos críticos">
-                  <div class="dash-kpi__risk">
-                    <div class="dash-kpi__ring" id="kpi-risk-ring"></div>
-                    <div>
-                      <span class="dash-kpi__label">Vulnerabilidades críticas</span>
-                      <span class="dash-kpi__value dash-kpi__value--risk" id="kpi-risk-count">—</span>
-                      <p class="dash-kpi__hint" id="kpi-risk-sub">Clic para mitigar · listado técnico</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface">
-                  <div class="dash-kpi__head">
-                    <span class="dash-kpi__label">Auditorías activas</span>
-                    <span class="dash-kpi__icon" data-icon="pending"></span>
-                  </div>
-                  <ul class="dash-audit-list" id="kpi-audit-list"></ul>
-                </div>
-              </div>
-
-              <div class="bento-grid">
+              <div class="bento-grid dash-hero-row">
                 <div class="glass-box dash-card bento-span-4 risk-index-card drill-target" id="risk-index-card" role="button" tabindex="0" title="Ver incidencias críticas">
                   <div class="card-head card-head--tight">
                     <span class="card-head__title card-head__title--caps">Índice de exposición al riesgo</span>
-                    <span class="grade-chip" id="score-grade">—</span>
                   </div>
                   <div class="risk-index__body">
-                    <div class="score-donut score-donut--center" id="score-donut"></div>
+                    <div class="risk-index__gauge">
+                      <div class="score-donut score-donut--compact" id="score-donut"></div>
+                    </div>
                     <p class="risk-index__risk" id="risk-label">Riesgo moderado</p>
                   </div>
                   <div class="risk-index__foot">
@@ -296,7 +246,58 @@
                   </div>
                   <div class="maturity-list" id="maturity-list"></div>
                 </div>
+              </div>
 
+              <div class="bento-grid dash-kpi-row">
+                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface drill-target" id="kpi-fw-card" role="button" tabindex="0" title="Ver controles del marco seleccionado">
+                  <div class="dash-kpi__head dash-kpi__head--badge">
+                    <span class="dash-kpi__label" id="kpi-fw-label">Cumplimiento ISO 27001</span>
+                    <div class="fw-compliance-badge fw-compliance-badge--sm" id="kpi-fw-badge" aria-hidden="true">
+                      <span class="fw-compliance-badge__icon" data-icon="verified"></span>
+                      <span class="fw-compliance-badge__body">
+                        <strong id="kpi-fw-badge-pct">—</strong>
+                        <small>Conforme</small>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="dash-kpi__value-row">
+                    <span class="dash-kpi__value" id="kpi-fw-pct">—</span>
+                    <span class="dash-kpi__delta dash-kpi__delta--down" id="kpi-fw-delta" hidden>
+                      <span data-icon="warning"></span><span>—</span>
+                    </span>
+                  </div>
+                  <div class="dash-kpi__track"><span id="kpi-fw-bar" style="width:0"></span></div>
+                  <p class="dash-kpi__hint" id="kpi-fw-target">Objetivo: 95% de madurez · Clic para detalle</p>
+                </div>
+                <div class="glass-box dash-card bento-span-4 health-score-card health-score-card--kpi mica-surface">
+                  <div class="health-score-card__label">Puntuación de salud global</div>
+                  <div class="health-score-card__layout">
+                    <div class="health-score-card__info">
+                      <div class="health-score-card__headline">
+                        <span class="health-score-card__grade" id="health-grade">—</span>
+                        <span class="health-score-card__status" id="health-status">Estable</span>
+                      </div>
+                      <div class="health-score-card__trend">
+                        <span class="health-score-card__trend-icon" data-icon="trend"></span>
+                        <span id="health-trend-text">—</span>
+                      </div>
+                    </div>
+                    <div class="health-score-card__viz">
+                      <div class="health-score-card__watermark" aria-hidden="true"><span data-icon="verified"></span></div>
+                      <div class="health-score-card__ring" id="health-ring"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="glass-box dash-card bento-span-4 dash-kpi mica-surface">
+                  <div class="dash-kpi__head">
+                    <span class="dash-kpi__label">Auditorías activas</span>
+                    <span class="dash-kpi__icon" data-icon="pending"></span>
+                  </div>
+                  <ul class="dash-audit-list" id="kpi-audit-list"></ul>
+                </div>
+              </div>
+
+              <div class="bento-grid dash-detail-row">
                 <div class="glass-box dash-card bento-span-12 controls-table-card filtered-table-card" id="filtered-table-card">
                   <div class="card-head card-head--tight card-head--table">
                     <span class="card-head__title card-head__title--caps" id="filtered-table-title">Estado de controles filtrados</span>
@@ -343,48 +344,36 @@
                   </div>
                 </div>
 
-                <div class="glass-box dash-card bento-span-12 stream-card">
-                  <div class="card-head card-head--tight">
-                    <span class="card-head__title card-head__title--caps">Flujo de cumplimiento reciente</span>
-                  </div>
-                  <ul class="stream-list" id="activity-list"></ul>
-                </div>
               </div>
 
-              <div class="ai-exec-grid">
-                <div class="glass-box ai-summary-card">
-                  <div class="card-head">
+              <div class="bento-grid dash-exec-row">
+                <div class="glass-box ai-exec-card bento-span-7">
+                  <div class="card-head card-head--exec">
                     <span class="card-head__title">
-                      <span class="ai-spark" data-icon="ai"></span>Resumen ejecutivo IA
+                      <span class="ai-spark" data-icon="sparkle"></span>Resumen ejecutivo IA
                     </span>
-                    <span class="live-chip" id="ai-summary-state">Listo</span>
+                    <span class="live-chip live-chip--analysis" id="ai-summary-state">ANÁLISIS EN VIVO</span>
                   </div>
                   <div class="ai-summary__body" id="ai-summary-body">
                     <p class="ai-summary__placeholder">Genera un análisis ejecutivo del estado de gobernanza con tu modelo Ollama configurado. Son sugerencias de la IA basadas en tus evaluaciones.</p>
                   </div>
-                  <div class="ai-summary__foot">
+                  <div class="ai-summary__cta" id="ai-summary-cta">
                     <button type="button" class="ws-btn primary" id="btn-ai-summary">
                       <span data-icon="ai"></span><span>Generar análisis</span>
                     </button>
-                    <button type="button" class="ws-btn" id="btn-ai-regen" hidden>
-                      <span data-icon="refresh"></span><span>Regenerar análisis</span>
-                    </button>
-                    <button type="button" class="ws-btn" id="btn-ai-copy" hidden>
-                      <span data-icon="copy"></span><span>Copiar</span>
-                    </button>
+                  </div>
+                  <div class="ai-summary__links" id="ai-summary-links" hidden>
+                    <button type="button" class="ai-link-btn" id="btn-ai-regen">Regenerar análisis</button>
+                    <span class="ai-link-sep" aria-hidden="true">|</span>
+                    <button type="button" class="ai-link-btn" id="btn-ai-copy">Copiar al portapapeles</button>
                   </div>
                 </div>
 
-                <div class="glass-box health-card">
-                  <div class="health-card__label">Estado de salud global</div>
-                  <div class="health-card__grade" id="health-grade">—</div>
-                  <div class="health-card__status">
-                    <span class="health-card__badge" id="health-status">Estable</span>
+                <div class="glass-box dash-card stream-card bento-span-5">
+                  <div class="card-head card-head--tight">
+                    <span class="card-head__title card-head__title--caps">Flujo de cumplimiento reciente</span>
                   </div>
-                  <div class="health-card__trend" id="health-trend">
-                    <span data-icon="trend"></span><span id="health-trend-text">Madurez media en seguimiento</span>
-                  </div>
-                  <div class="health-card__ring" id="health-ring"></div>
+                  <ul class="stream-list" id="activity-list"></ul>
                 </div>
               </div>
 
@@ -397,24 +386,24 @@
                   <div class="remediation-list" id="remediation-list"></div>
                 </div>
                 <div class="glass-box dash-card gapmatrix-card">
-                  <div class="card-head card-head--tight">
-                    <span class="card-head__title card-head__title--caps">Mapa de brechas — Dominio × Marco</span>
+                  <div class="card-head card-head--gap">
+                    <div class="gapmatrix-card__titles">
+                      <span class="card-head__title">Mapa de brechas</span>
+                      <span class="gapmatrix-card__sub">Alineación de marcos vs. implementación por dominio</span>
+                    </div>
                     <span class="matrix-legend">
-                      <span><i class="cell-crit"></i>Crítico</span>
+                      <span><i class="cell-crit"></i>Brecha crítica</span>
                       <span><i class="cell-part"></i>Parcial</span>
                       <span><i class="cell-ok"></i>Alineado</span>
                     </span>
                   </div>
-                  <div class="gapmatrix-wrap grid-table-wrap" id="gap-matrix"></div>
+                  <div class="gapmatrix-wrap" id="gap-matrix"></div>
                 </div>
               </div>
               </div>
             </div>
 
-            <div class="norvik-panel" data-panel="nist" id="panel-nist"></div>
-            <div class="norvik-panel" data-panel="iso" id="panel-iso"></div>
-            <div class="norvik-panel" data-panel="cis" id="panel-cis"></div>
-            <div class="norvik-panel" data-panel="rgpd" id="panel-rgpd"></div>
+            <div class="norvik-panel" data-panel="frameworks" id="panel-frameworks"></div>
 
             <div class="norvik-panel" data-panel="reports">
               <div id="reports-content" class="reports-page">
@@ -435,54 +424,61 @@
                 <p id="report-result" class="report-export__result"></p>
 
                 <div class="bento-grid reports-bento">
-                  <div class="glass-box dash-card bento-span-7 rpt-ai-card">
-                    <div class="card-head">
+                  <div class="glass-box dash-card bento-span-7 ai-exec-card">
+                    <div class="card-head card-head--exec">
                       <span class="card-head__title">
-                        <span class="ai-spark" data-icon="ai"></span>Resumen ejecutivo IA
+                        <span class="ai-spark" data-icon="sparkle"></span>Resumen ejecutivo IA
                       </span>
-                      <span class="live-chip" id="rpt-ai-summary-state">Listo</span>
+                      <span class="live-chip live-chip--analysis" id="rpt-ai-summary-state">ANÁLISIS EN VIVO</span>
                     </div>
                     <div class="ai-summary__body" id="rpt-ai-summary-body">
                       <p class="ai-summary__placeholder">Genera un análisis ejecutivo del estado de gobernanza con Ollama. Las sugerencias se basan en tus evaluaciones actuales.</p>
                     </div>
-                    <div class="ai-summary__foot">
+                    <div class="ai-summary__cta" id="rpt-ai-summary-cta">
                       <button type="button" class="ws-btn primary" id="rpt-btn-ai-summary">
                         <span data-icon="ai"></span><span>Generar análisis</span>
                       </button>
-                      <button type="button" class="ws-btn" id="rpt-btn-ai-regen" hidden>
-                        <span data-icon="refresh"></span><span>Regenerar</span>
-                      </button>
-                      <button type="button" class="ws-btn" id="rpt-btn-ai-copy" hidden>
-                        <span data-icon="copy"></span><span>Copiar</span>
-                      </button>
+                    </div>
+                    <div class="ai-summary__links" id="rpt-ai-summary-links" hidden>
+                      <button type="button" class="ai-link-btn" id="rpt-btn-ai-regen">Regenerar análisis</button>
+                      <span class="ai-link-sep" aria-hidden="true">|</span>
+                      <button type="button" class="ai-link-btn" id="rpt-btn-ai-copy">Copiar al portapapeles</button>
                     </div>
                   </div>
 
-                  <div class="glass-box dash-card bento-span-5 health-card health-card--brand">
-                    <div class="health-card__label">Estado de salud global</div>
-                    <div class="health-card__grade" id="rpt-health-grade">—</div>
-                    <div class="health-card__status">
-                      <span class="health-card__badge" id="rpt-health-status">Estable</span>
-                    </div>
-                    <div class="health-card__trend" id="rpt-health-trend">
-                      <span data-icon="trend"></span><span id="rpt-health-trend-text">Madurez media en seguimiento</span>
-                    </div>
-                    <div class="health-card__ring" id="rpt-health-ring"></div>
-                    <div class="health-card__watermark" aria-hidden="true">
-                      <img src="norvik-logo.png" alt="" width="100" height="auto" />
+                  <div class="glass-box dash-card bento-span-5 health-score-card">
+                    <div class="health-score-card__label">Puntuación de salud global</div>
+                    <div class="health-score-card__layout">
+                      <div class="health-score-card__info">
+                        <div class="health-score-card__headline">
+                          <span class="health-score-card__grade" id="rpt-health-grade">—</span>
+                          <span class="health-score-card__status" id="rpt-health-status">Estable</span>
+                        </div>
+                        <div class="health-score-card__trend">
+                          <span class="health-score-card__trend-icon" data-icon="trend"></span>
+                          <span id="rpt-health-trend-text">—</span>
+                        </div>
+                      </div>
+                      <div class="health-score-card__viz">
+                        <div class="health-score-card__watermark" aria-hidden="true"><span data-icon="verified"></span></div>
+                        <div class="health-score-card__ring" id="rpt-health-ring"></div>
+                      </div>
                     </div>
                   </div>
 
                   <div class="glass-box dash-card bento-span-12 gapmatrix-card">
-                    <div class="card-head card-head--tight">
-                      <span class="card-head__title card-head__title--caps">Mapa de brechas — Dominio × Marco</span>
+                    <div class="card-head card-head--gap">
+                      <div class="gapmatrix-card__titles">
+                        <span class="card-head__title">Mapa de brechas</span>
+                        <span class="gapmatrix-card__sub">Alineación de marcos vs. implementación por dominio</span>
+                      </div>
                       <span class="matrix-legend">
-                        <span><i class="cell-crit"></i>Crítico</span>
+                        <span><i class="cell-crit"></i>Brecha crítica</span>
                         <span><i class="cell-part"></i>Parcial</span>
                         <span><i class="cell-ok"></i>Alineado</span>
                       </span>
                     </div>
-                    <div class="gapmatrix-wrap grid-table-wrap" id="rpt-gap-matrix"></div>
+                    <div class="gapmatrix-wrap" id="rpt-gap-matrix"></div>
                   </div>
 
                   <div class="glass-box dash-card bento-span-8 remediation-card">
@@ -690,24 +686,22 @@
     </div>
     <div class="filter-drawer__foot drill-drawer__foot">
       <button type="button" class="ws-btn" id="drill-scroll-table">
-        <span data-icon="filter"></span><span>Ver en tabla filtrada</span>
+        <span data-icon="filter"></span><span>Ir al dashboard filtrado</span>
       </button>
-      <button type="button" class="ws-btn primary" id="drill-ai-first" hidden>
-        <span data-icon="ai"></span><span>Mitigar el primero con IA</span>
+      <button type="button" class="ws-btn primary" id="drill-open-first">
+        <span data-icon="export"></span><span>Abrir control prioritario</span>
+      </button>
+      <button type="button" class="ws-btn" id="drill-ai-first" hidden>
+        <span data-icon="ai"></span><span>Mitigar con IA</span>
       </button>
     </div>
   </aside>
-
-  <button type="button" class="dash-fab" id="dash-fab" title="Nuevo recurso" hidden>
-    <span data-icon="add"></span>
-    <span class="dash-fab__tip">Nuevo recurso</span>
-  </button>
 
   <div class="modal-overlay profile-modal-overlay" id="user-profile-modal" hidden>
     <div class="modal-card glass-panel user-profile-card">
       <div class="modal-card__head">
         <div>
-          <span class="card-head__title"><img class="modal-brand-logo" src="norvik-logo.png" width="88" height="26" alt="" /> Mi perfil</span>
+          <span class="card-head__title">Mi perfil</span>
           <p class="profile-modal__sub">Identidad profesional para Norvik, informes PDF y asistente IA</p>
         </div>
         <button type="button" class="icon-btn" id="profile-close" aria-label="Cerrar"><span data-icon="close"></span></button>
@@ -723,7 +717,7 @@
             <input type="file" id="profile-avatar-input" accept="image/png,image/jpeg,image/webp" hidden />
             <div class="profile-avatar-meta">
               <strong>Foto de perfil</strong>
-              <span>PNG, JPG o WebP · máx. 2 MB</span>
+              <span>PNG, JPG o WebP · máx. 3 MB</span>
               <div class="profile-avatar-actions">
                 <button type="button" class="ws-btn" id="profile-avatar-upload">
                   <span data-icon="upload"></span><span>Subir foto</span>
@@ -834,14 +828,19 @@
         <button type="button" class="icon-btn" id="support-close" aria-label="Cerrar"><span data-icon="close"></span></button>
       </div>
       <div class="modal-card__body">
-        <p>Norvik es tu plataforma de gobernanza, riesgo y cumplimiento (GRC) para NIST CSF 2.0, ISO 27001, CIS Controls v8 y RGPD.</p>
+        <p>Norvik es tu plataforma de gobernanza, riesgo y cumplimiento (GRC) para evaluar madurez, priorizar brechas y documentar evidencias bajo NIST CSF 2.0, ISO 27001, CIS Controls v8 y RGPD.</p>
+        <p>Si necesitas ayuda con la configuración, la interpretación de controles o soporte técnico, escríbeme por LinkedIn o revisa el repositorio en GitHub:</p>
+        <div class="support-links">
+          <a class="support-link" href="https://www.linkedin.com/in/yoandyrd92/" target="_blank" rel="noopener noreferrer">LinkedIn · Yoandy Ramirez Delgado</a>
+          <a class="support-link" href="https://github.com/heindall92" target="_blank" rel="noopener noreferrer">GitHub · heindall92</a>
+        </div>
         <ul class="support-list">
-          <li><strong>Evaluar madurez:</strong> abre un marco en el menú y asigna nivel CMM (L0–L5) a cada control.</li>
-          <li><strong>Dashboard:</strong> revisa score global, brechas críticas y el mapa de brechas Dominio × Marco.</li>
-          <li><strong>Asistente IA:</strong> configura Ollama en Configuración para recibir recomendaciones.</li>
-          <li><strong>Informes:</strong> genera el PDF ejecutivo desde la sección Informes.</li>
+          <li><strong>Evaluar madurez:</strong> entra en Framework, elige un marco y asigna nivel CMM (L0–L5) a cada control.</li>
+          <li><strong>Dashboard:</strong> revisa score global, salud de cumplimiento y el mapa de brechas por dominio.</li>
+          <li><strong>Asistente IA:</strong> configura Ollama en Configuración para recomendaciones contextualizadas.</li>
+          <li><strong>Informes:</strong> genera el PDF ejecutivo desde la sección Informes PDF.</li>
         </ul>
-        <p class="support-meta">Norvik · Enterprise Edition · v1.0</p>
+        <p class="support-meta">Norvik · Enterprise Edition · v1.0 · Desarrollado por Yoandy Ramirez Delgado</p>
       </div>
     </div>
   </div>

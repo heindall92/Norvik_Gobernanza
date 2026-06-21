@@ -421,6 +421,55 @@ def get_recommendations(gap_data: dict[str, Any], settings: dict[str, str] | Non
     return _run_chat([{"role": "user", "content": user_prompt}], settings, status=status)
 
 
+def generate_executive_summary(
+    dashboard: dict[str, Any],
+    settings: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Genera el análisis ejecutivo global para informes PDF."""
+    settings = settings or {}
+    status = test_connection(settings)
+    fw_scores = dashboard.get("framework_scores") or {}
+    fw_parts = []
+    labels = {
+        "NIST_CSF2": "NIST CSF 2.0",
+        "ISO27001": "ISO 27001:2022",
+        "CIS_V8": "CIS Controls v8",
+        "RGPD": "RGPD",
+    }
+    for code, label in labels.items():
+        s = fw_scores.get(code) or {}
+        if s:
+            fw_parts.append(f"{label}: {s.get('score', 0)}%")
+
+    alerts = dashboard.get("alerts") or []
+    top_critical = [
+        f"{a.get('control_id')} ({a.get('framework')})"
+        for a in alerts
+        if a.get("severity") == "critical"
+    ][:8]
+
+    notes = (
+        f"Score global {round(dashboard.get('global_score') or 0)}% "
+        f"(nota {dashboard.get('grade', '—')}). "
+        f"Controles conformes: {dashboard.get('controls_met', 0)}. "
+        f"No conformes: {dashboard.get('non_compliant', 0)}. "
+        f"Críticas: {dashboard.get('critical_count', 0)}, "
+        f"advertencias: {dashboard.get('warning_count', 0)}. "
+        f"Marcos: {'; '.join(fw_parts) or 'sin datos'}."
+    )
+    if top_critical:
+        notes += f" Brechas críticas destacadas: {', '.join(top_critical)}."
+
+    user_prompt = (
+        "Redacta un ANÁLISIS EJECUTIVO para un informe PDF de GRC (2-4 párrafos).\n"
+        "Debe interpretar los datos detectados, argumentar el nivel de riesgo y priorizar acciones.\n"
+        "Referencia explícitamente score global, marcos normativos y brechas críticas.\n"
+        "Cierra con 3-5 decisiones recomendadas numeradas para la dirección.\n\n"
+        f"Datos de la evaluación:\n{notes}"
+    )
+    return _run_chat([{"role": "user", "content": user_prompt}], settings, status=status)
+
+
 def chat_message(message: str, settings: dict[str, str] | None = None) -> dict[str, Any]:
     settings = settings or {}
     text = (message or "").strip()

@@ -9,8 +9,8 @@ window.NorvikLoader = (function () {
     { p: 90, t: 'Preparando interfaz' },
   ];
 
-  const MIN_VISIBLE_MS = 5500;
-  const FORCE_HIDE_MS = MIN_VISIBLE_MS + 2500;
+  const MIN_VISIBLE_MS = 3500;
+  const FORCE_HIDE_MS = MIN_VISIBLE_MS + 1500;
 
   let el, fillEl, pctEl, phaseEl;
   let progress = 0;

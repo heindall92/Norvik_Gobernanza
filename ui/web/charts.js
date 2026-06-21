@@ -105,32 +105,59 @@ function renderFrameworkBars(container, bars) {
     </div>`).join('');
 }
 
-function renderScoreDonut(container, score, grade) {
+function renderHealthDonut(container, score, size = 132) {
   if (!container) return;
   const pct = Math.max(0, Math.min(100, Math.round(score || 0)));
-  const size = 168;
-  const stroke = 16;
+  const stroke = Math.max(10, Math.round(size * 0.106));
   const r = (size - stroke) / 2;
   const cx = size / 2;
   const circ = 2 * Math.PI * r;
   const dash = (pct / 100) * circ;
+  const gradId = `healthDonutGrad-${Math.random().toString(36).slice(2, 9)}`;
+  container.innerHTML = `
+    <svg viewBox="0 0 ${size} ${size}" class="health-donut-svg" aria-label="Salud ${pct}%">
+      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${stroke}"/>
+      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="url(#${gradId})"
+        stroke-width="${stroke}" stroke-linecap="round"
+        stroke-dasharray="${dash} ${circ - dash}"
+        transform="rotate(-90 ${cx} ${cx})"/>
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="color-mix(in srgb, var(--accent) 82%, #fff)"/>
+          <stop offset="100%" stop-color="var(--accent)"/>
+        </linearGradient>
+      </defs>
+      <text x="${cx}" y="${cx}" text-anchor="middle" dominant-baseline="central" class="health-donut-pct">${pct}<tspan class="health-donut-pct-sym">%</tspan></text>
+    </svg>`;
+}
+
+function renderScoreDonut(container, score, grade, size = 168) {
+  if (!container) return;
+  const pct = Math.max(0, Math.min(100, Math.round(score || 0)));
+  const stroke = Math.max(10, Math.round(size * 0.095));
+  const r = (size - stroke) / 2;
+  const cx = size / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (pct / 100) * circ;
+  const gradId = `donutGrad-${Math.random().toString(36).slice(2, 9)}`;
+  const fontMain = size <= 120 ? 22 : 26;
+  const fontSym = size <= 120 ? 13 : 15;
   container.innerHTML = `
     <svg viewBox="0 0 ${size} ${size}" class="donut-svg" aria-label="Score ${pct}%">
       <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${stroke}"/>
-      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="url(#donutGrad)"
+      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="url(#${gradId})"
         stroke-width="${stroke}" stroke-linecap="round"
         stroke-dasharray="${dash} ${circ - dash}"
         transform="rotate(-90 ${cx} ${cx})">
         <animate attributeName="stroke-dasharray" from="0 ${circ}" to="${dash} ${circ - dash}" dur="0.9s" fill="freeze" calcMode="spline" keySplines="0.22 1 0.36 1"/>
       </circle>
       <defs>
-        <linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="color-mix(in srgb, var(--accent) 70%, #000)"/>
           <stop offset="100%" stop-color="var(--accent)"/>
         </linearGradient>
       </defs>
-      <text x="${cx}" y="${cx - 4}" text-anchor="middle" class="donut-pct">${pct}<tspan class="donut-pct-sym">%</tspan></text>
-      <text x="${cx}" y="${cx + 20}" text-anchor="middle" class="donut-sub">${grade || ''}</text>
+      <text x="${cx}" y="${cx}" text-anchor="middle" dominant-baseline="central" class="donut-pct" font-size="${fontMain}">${pct}<tspan class="donut-pct-sym" font-size="${fontSym}">%</tspan></text>
     </svg>`;
 }
 
@@ -157,8 +184,8 @@ function renderMaturityOverview(container, bars) {
 }
 
 function matrixCellClass(percent) {
-  if (percent >= 60) return 'cell-ok';
-  if (percent >= 40) return 'cell-part';
+  if (percent >= 80) return 'cell-ok';
+  if (percent >= 60) return 'cell-part';
   return 'cell-crit';
 }
 
@@ -169,6 +196,7 @@ function renderGapMatrix(container, matrix) {
     container.innerHTML = '<p class="empty-hint">Sin datos suficientes para el mapa de brechas. Completa evaluaciones de madurez.</p>';
     return;
   }
+  const esc = (s) => String(s).replace(/"/g, '&quot;');
   const head = `<div class="matrix-row matrix-row--head">
       <div class="matrix-cell matrix-cell--rowlabel">Dominio</div>
       ${data.frameworks.map((f) => `<div class="matrix-cell matrix-cell--collabel">${f.label}</div>`).join('')}
@@ -176,9 +204,14 @@ function renderGapMatrix(container, matrix) {
   const body = data.domains.map((domain) => {
     const cols = data.frameworks.map((f) => {
       const cell = data.cells[`${domain}|${f.code}`];
-      if (!cell) return '<div class="matrix-cell matrix-cell--empty">N/A</div>';
+      if (!cell) {
+        return '<div class="matrix-cell matrix-cell--data"><span class="matrix-pill matrix-pill--na">N/A</span></div>';
+      }
       const pct = Math.round(cell.percent);
-      return `<div class="matrix-cell ${matrixCellClass(cell.percent)}" data-drill-domain="${domain.replace(/"/g, '&quot;')}" data-drill-fw="${f.code}" role="button" tabindex="0" title="${domain} · ${f.label}: ${pct}% — ver brechas">${pct}%</div>`;
+      const cls = matrixCellClass(cell.percent);
+      return `<div class="matrix-cell matrix-cell--data">
+        <span class="matrix-pill ${cls}" data-drill-domain="${esc(domain)}" data-drill-fw="${f.code}" role="button" tabindex="0" title="${esc(domain)} · ${esc(f.label)}: ${pct}%">${pct}%</span>
+      </div>`;
     }).join('');
     return `<div class="matrix-row">
         <div class="matrix-cell matrix-cell--rowlabel">${domain}</div>${cols}
@@ -193,6 +226,7 @@ window.NorvikCharts = {
   renderRadar,
   renderHeatmap,
   renderFrameworkBars,
+  renderHealthDonut,
   renderScoreDonut,
   renderMaturityOverview,
   renderGapMatrix,

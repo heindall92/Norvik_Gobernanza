@@ -19,7 +19,7 @@ from core.maturity import (
 from core.ollama_client import chat_message, check_status, get_recommendations, list_models, test_connection
 from core.pdf_export import generate_report
 from core.settings import get_all_settings, save_settings
-from core.user_avatar import avatar_file_url, remove_avatar, save_avatar_data_url
+from core.user_avatar import avatar_data_url, remove_avatar, save_avatar_data_url
 
 
 class Bridge(QObject):
@@ -104,13 +104,19 @@ class Bridge(QObject):
     @Slot(str, result=str)
     def export_pdf(self, report_config: str = "{}") -> str:
         try:
+            config = json.loads(report_config) if report_config else {}
+            if not isinstance(config, dict):
+                config = {}
             settings = get_all_settings(self._conn)
             org_name = settings.get("org_name", "Mi Organización")
+            ai_summary = (config.get("ai_summary") or "").strip() or None
             path = generate_report(
                 self._conn,
                 org_name,
                 auditor_name=settings.get("user_name", ""),
                 auditor_role=settings.get("user_role", ""),
+                ai_summary=ai_summary,
+                settings=settings,
             )
             return json.dumps(
                 {"ok": True, "path": str(path), "message": f"Informe guardado en {path}"},
@@ -137,7 +143,7 @@ class Bridge(QObject):
     @Slot(result=str)
     def get_settings(self) -> str:
         settings = get_all_settings(self._conn)
-        settings["user_avatar_url"] = avatar_file_url()
+        settings["user_avatar_url"] = avatar_data_url()
         return json.dumps(settings, ensure_ascii=False)
 
     @Slot(str, result=str)
@@ -164,7 +170,7 @@ class Bridge(QObject):
                 update_org_name(self._conn, data["org_name"])
             save_settings(self._conn, data)
             settings = get_all_settings(self._conn)
-            settings["user_avatar_url"] = avatar_file_url()
+            settings["user_avatar_url"] = avatar_data_url()
             return json.dumps({"ok": True, "settings": settings}, ensure_ascii=False)
         except Exception as exc:
             return json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False)

@@ -269,11 +269,6 @@ window.NorvikTheme = (function () {
             <button type="button" class="sw ${i === state.accent ? 'active' : ''}" style="--c:${s.c};background:radial-gradient(circle at 35% 30%, ${softer(s.c)}, ${s.c})" data-acc="${i}" aria-label="${s.name}"></button>
             <span class="sw-name">${i === state.accent ? s.name : ''}</span>
           </div>`).join('')}
-      </div>
-      <div class="label">Radio de esquinas</div>
-      <div class="slider-row">
-        <input type="range" min="4" max="16" step="1" value="${state.radius}" id="theme-radius" style="--fill:${((state.radius - 4) / 12) * 100}%">
-        <div class="ticks num"><span>4</span><span>8</span><span>12</span><span>16</span></div>
       </div>`;
 
     initThemeModeSeg(container);
@@ -305,12 +300,6 @@ window.NorvikTheme = (function () {
       });
     }
 
-    const rad = container.querySelector('#theme-radius');
-    rad.addEventListener('input', () => {
-      state.radius = +rad.value;
-      rad.style.setProperty('--fill', ((rad.value - 4) / 12) * 100 + '%');
-      apply();
-    });
   }
 
   if (window.matchMedia) {
