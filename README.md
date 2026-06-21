@@ -6,7 +6,7 @@ Desarrollado por [Yoandy Ramirez Delgado](https://www.linkedin.com/in/yoandyrd92
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![PySide6](https://img.shields.io/badge/PySide6-6.7%2B-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+![License](https://img.shields.io/badge/License-Propietaria-red)
 
 ## Características
 
@@ -75,7 +75,11 @@ Norvik_Gobernanza/
 
 ## Licencia
 
-Este proyecto se distribuye bajo la **Licencia MIT**. Consulta el archivo [LICENSE](LICENSE) para el texto completo.
+**Software propietario — todos los derechos reservados © 2026 Yoandy Ramirez Delgado.**
+
+Este repositorio es visible con fines de demostración y portfolio. **No concede permiso** para copiar, modificar, distribuir ni usar Norvik en producción sin una **licencia comercial** acordada con el autor.
+
+Consulta el archivo [LICENSE](LICENSE) para los términos completos. Para licenciar el producto, contacta por [LinkedIn](https://www.linkedin.com/in/yoandyrd92/) o [GitHub](https://github.com/heindall92).
 
 ### Dependencias de terceros
 

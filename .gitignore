@@ -30,5 +30,11 @@ Desktop.ini
 *.db
 *.sqlite3
 
-# Temp
+# Temp / basura local
 script.py
+error.log
+
+# Material ajeno al proyecto (no versionar)
+Pinterest-Portfolio Yoandy/
+*.zip
+*.mp4
