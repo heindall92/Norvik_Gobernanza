@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
-import sqlite3
-from typing import Any
+from core.secrets import get_cloud_api_key, set_cloud_api_key
 
 DEFAULTS: dict[str, str] = {
     "theme": "workspace",
@@ -36,6 +34,7 @@ DEFAULTS: dict[str, str] = {
     "user_twitter": "",
     "user_website": "",
     "user_avatar": "",
+    "demo_mode": "0",
     "edition": "Enterprise Edition",
 }
 
@@ -69,12 +68,16 @@ def get_all_settings(conn: sqlite3.Connection) -> dict[str, str]:
         merged["accent_index"] = idx
         merged["accent_color"] = color
         merged["theme"] = "workspace"
+    merged["ollama_cloud_key"] = get_cloud_api_key(conn)
     return merged
 
 
 def save_settings(conn: sqlite3.Connection, data: dict[str, Any]) -> None:
-    for key, value in data.items():
-        if key in SETTING_KEYS:
+    payload = dict(data)
+    if "ollama_cloud_key" in payload:
+        set_cloud_api_key(conn, str(payload.pop("ollama_cloud_key") or ""))
+    for key, value in payload.items():
+        if key in SETTING_KEYS and key != "ollama_cloud_key":
             set_setting(conn, key, str(value))
 
 

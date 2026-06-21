@@ -12,7 +12,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from core.database import get_documents_dir
+from core.database import get_documents_dir, is_demo_mode
 from core.maturity import (
     compute_global_score,
     get_alerts,
@@ -251,6 +251,14 @@ def generate_report(
         role = f" — {_escape_pdf(auditor_role)}" if auditor_role.strip() else ""
         story.append(Paragraph(f"Responsable: <b>{_escape_pdf(auditor_name)}</b>{role}", styles["body"]))
     story.append(Paragraph(f"Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["body"]))
+    if is_demo_mode(conn):
+        story.append(
+            Paragraph(
+                "<b>AVISO:</b> Este informe incluye datos de DEMOSTRACIÓN. "
+                "No es válido para auditorías ni cumplimiento oficial.",
+                styles["body"],
+            )
+        )
     story.append(Spacer(1, 0.3 * cm))
 
     story.append(Paragraph("Resumen de hallazgos detectados", styles["heading"]))

@@ -9,7 +9,10 @@ from datetime import datetime
 from pathlib import Path
 
 from core.frameworks import export_framework_json, seed_frameworks
-from core.settings import DEFAULTS, set_setting
+from core.settings import DEFAULTS, get_setting, set_setting
+
+DEMO_NOTE = "[DEMO] Evaluación de demostración — no usar en informes oficiales"
+LEGACY_DEMO_NOTE = "Evaluación inicial de demostración"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS organizations (
@@ -110,43 +113,89 @@ def initialize(db_path: Path | None = None) -> sqlite3.Connection:
     fw_count = conn.execute("SELECT COUNT(*) AS c FROM frameworks").fetchone()["c"]
     if fw_count == 0:
         seed_frameworks(conn)
-        _seed_demo_assessments(conn)
 
+    _migrate_legacy_demo_flag(conn)
     export_framework_json()
     conn.commit()
     return conn
 
 
-def _seed_demo_assessments(conn: sqlite3.Connection) -> None:
-    """Seed demo maturity levels so dashboard is populated on first run."""
-    org_id = conn.execute("SELECT id FROM organizations LIMIT 1").fetchone()["id"]
+def _migrate_legacy_demo_flag(conn: sqlite3.Connection) -> None:
+    """Mark existing auto-seeded demo rows as demo mode (upgrade path)."""
+    if get_setting(conn, "demo_mode", "0") == "1":
+        return
+    row = conn.execute(
+        """
+        SELECT COUNT(*) AS c FROM assessments
+        WHERE notes LIKE ? OR notes = ?
+        """,
+        (f"{DEMO_NOTE}%", LEGACY_DEMO_NOTE),
+    ).fetchone()
+    if row and int(row["c"]) > 0:
+        set_setting(conn, "demo_mode", "1")
+        conn.execute(
+            "UPDATE assessments SET notes = ? WHERE notes = ?",
+            (DEMO_NOTE, LEGACY_DEMO_NOTE),
+        )
+        conn.commit()
+
+
+def load_demo_assessments(conn: sqlite3.Connection) -> int:
+    """Opt-in demo data for exploration. Returns number of controls seeded."""
+    org_id = get_organization_id(conn)
     controls = conn.execute(
         """
-        SELECT c.id, c.framework_id, c.weight,
-               (ABS(c.id * 17) % 6) AS demo_level
+        SELECT c.id, c.weight, (ABS(c.id * 17) % 6) AS demo_level
         FROM controls c
         """
     ).fetchall()
-
+    count = 0
+    now = datetime.now().isoformat()
     for row in controls:
         demo_level = int(row["demo_level"])
         if demo_level == 5 and row["weight"] >= 3:
             demo_level = 2
         conn.execute(
             """
-            INSERT OR IGNORE INTO assessments
+            INSERT INTO assessments
             (organization_id, control_id, maturity_level, notes, assessed_at)
             VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(organization_id, control_id) DO UPDATE SET
+                maturity_level = excluded.maturity_level,
+                notes = excluded.notes,
+                assessed_at = excluded.assessed_at
             """,
-            (
-                org_id,
-                row["id"],
-                demo_level,
-                "Evaluación inicial de demostración",
-                datetime.now().isoformat(),
-            ),
+            (org_id, row["id"], demo_level, DEMO_NOTE, now),
         )
+        count += 1
+    set_setting(conn, "demo_mode", "1")
+    set_setting(conn, "last_review", datetime.now().strftime("%d/%m/%Y %H:%M"))
     conn.commit()
+    return count
+
+
+def clear_demo_assessments(conn: sqlite3.Connection) -> int:
+    """Remove demo assessments only."""
+    org_id = get_organization_id(conn)
+    cur = conn.execute(
+        """
+        DELETE FROM assessments
+        WHERE organization_id = ? AND (notes LIKE ? OR notes = ?)
+        """,
+        (org_id, f"{DEMO_NOTE}%", LEGACY_DEMO_NOTE),
+    )
+    set_setting(conn, "demo_mode", "0")
+    conn.commit()
+    return cur.rowcount
+
+
+def is_demo_mode(conn: sqlite3.Connection) -> bool:
+    return get_setting(conn, "demo_mode", "0") == "1"
+
+
+def _seed_demo_assessments(conn: sqlite3.Connection) -> None:
+    """Deprecated: use load_demo_assessments() explicitly."""
+    load_demo_assessments(conn)
 
 
 def get_organization_id(conn: sqlite3.Connection) -> int:

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import uuid
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Slot
+from PySide6.QtCore import QObject, QThreadPool, Signal, Slot
 
-from core.database import get_organization_id, update_org_name
+from core.ai_worker import AiWorker
+from core.database import clear_demo_assessments, load_demo_assessments
 from core.maturity import (
     find_control_page,
     get_controls_page,
@@ -23,9 +25,18 @@ from core.user_avatar import avatar_data_url, remove_avatar, save_avatar_data_ur
 
 
 class Bridge(QObject):
+    aiTaskFinished = Signal(str)
+
     def __init__(self, conn, parent=None) -> None:
         super().__init__(parent)
         self._conn = conn
+        self._pool = QThreadPool.globalInstance()
+
+    def _start_ai_task(self, kind: str, task) -> str:
+        request_id = uuid.uuid4().hex
+        worker = AiWorker(request_id, kind, task, self.aiTaskFinished.emit)
+        self._pool.start(worker)
+        return json.dumps({"ok": True, "pending": True, "request_id": request_id}, ensure_ascii=False)
 
     @Slot(str, result=str)
     def get_dashboard_data(self, framework: str = "ALL") -> str:
@@ -87,8 +98,11 @@ class Bridge(QObject):
         try:
             gap = json.loads(gap_data) if gap_data else {}
             settings = get_all_settings(self._conn)
-            result = get_recommendations(gap, settings)
-            return json.dumps(result, ensure_ascii=False)
+
+            def task():
+                return get_recommendations(gap, settings)
+
+            return self._start_ai_task("recommendations", task)
         except Exception as exc:
             return json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False)
 
@@ -96,10 +110,35 @@ class Bridge(QObject):
     def ai_chat(self, message: str) -> str:
         try:
             settings = get_all_settings(self._conn)
-            result = chat_message(message, settings)
-            return json.dumps(result, ensure_ascii=False)
+
+            def task():
+                return chat_message(message, settings)
+
+            return self._start_ai_task("chat", task)
         except Exception as exc:
             return json.dumps({"ok": False, "error": str(exc), "content": ""}, ensure_ascii=False)
+
+    @Slot(result=str)
+    def load_demo_data(self) -> str:
+        try:
+            count = load_demo_assessments(self._conn)
+            return json.dumps(
+                {"ok": True, "demo_mode": True, "count": count, "message": "Datos de demostración cargados"},
+                ensure_ascii=False,
+            )
+        except Exception as exc:
+            return json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False)
+
+    @Slot(result=str)
+    def clear_demo_data(self) -> str:
+        try:
+            removed = clear_demo_assessments(self._conn)
+            return json.dumps(
+                {"ok": True, "demo_mode": False, "removed": removed, "message": "Datos de demostración eliminados"},
+                ensure_ascii=False,
+            )
+        except Exception as exc:
+            return json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False)
 
     @Slot(str, result=str)
     def export_pdf(self, report_config: str = "{}") -> str:
@@ -165,6 +204,8 @@ class Bridge(QObject):
     @Slot(str, result=str)
     def save_settings(self, payload: str) -> str:
         try:
+            from core.database import update_org_name
+
             data = json.loads(payload) if payload else {}
             if "org_name" in data:
                 update_org_name(self._conn, data["org_name"])

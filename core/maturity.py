@@ -6,6 +6,7 @@ import sqlite3
 from datetime import datetime
 
 from core.database import get_organization_id
+from core.settings import get_setting
 
 NIST_DOMAINS = ["Govern", "Identify", "Protect", "Detect", "Respond", "Recover"]
 TARGET_LEVEL = 3
@@ -422,6 +423,7 @@ def get_dashboard_payload(conn: sqlite3.Connection, framework: str = "ALL") -> d
     global_score = compute_global_score_from_rows(rows)
     total_controls = len(rows)
     non_compliant = counts["critical"] + counts["warning"]
+    assessed_count = conn.execute("SELECT COUNT(*) AS c FROM assessments").fetchone()["c"]
 
     return {
         "org_name": org["name"] if org else "Mi Organización",
@@ -431,6 +433,8 @@ def get_dashboard_payload(conn: sqlite3.Connection, framework: str = "ALL") -> d
         "global_score": global_score,
         "grade": score_to_grade(global_score),
         "total_controls": total_controls,
+        "assessed_count": int(assessed_count),
+        "has_assessments": int(assessed_count) > 0,
         "controls_met": counts["ok"],
         "non_compliant": non_compliant,
         "critical_count": counts["critical"],
@@ -451,6 +455,7 @@ def get_dashboard_payload(conn: sqlite3.Connection, framework: str = "ALL") -> d
             "RGPD": compute_framework_score_from_rows(rows, "RGPD"),
         },
         "badge_counts": get_badge_counts_from_rows(rows),
+        "demo_mode": get_setting(conn, "demo_mode", "0") == "1",
     }
 
 

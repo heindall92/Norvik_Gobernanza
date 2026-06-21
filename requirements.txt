@@ -3,3 +3,4 @@ PySide6-Addons>=6.7.0
 ollama>=0.3.0
 reportlab>=4.0.0
 PyInstaller>=6.0.0
+keyring>=25.0.0

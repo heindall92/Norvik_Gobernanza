@@ -71,15 +71,23 @@ Norvik_Gobernanza/
 
 - Las evaluaciones se guardan en SQLite en el directorio de datos de la aplicación del usuario.
 - Las fotos de perfil se almacenan localmente (máx. 3 MB).
+- La API key de Ollama Cloud se guarda en el **Credential Manager de Windows** (keyring), no en texto plano.
 - Ollama local no envía datos fuera del equipo salvo que configures el proveedor cloud.
+- Los **datos de demostración** son opt-in, se marcan con badge **DEMO** y no son válidos para auditoría.
 
-## Licencia
+## Licencia comercial
 
 **Software propietario — todos los derechos reservados © 2026 Yoandy Ramirez Delgado.**
 
-Este repositorio es visible con fines de demostración y portfolio. **No concede permiso** para copiar, modificar, distribuir ni usar Norvik en producción sin una **licencia comercial** acordada con el autor.
+| Documento | Contenido |
+|-----------|-----------|
+| [LICENSE](LICENSE) | Términos legales de propiedad intelectual |
+| [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) | Modalidades de licencia, uso permitido y cómo contratar |
 
-Consulta el archivo [LICENSE](LICENSE) para los términos completos. Para licenciar el producto, contacta por [LinkedIn](https://www.linkedin.com/in/yoandyrd92/) o [GitHub](https://github.com/heindall92).
+Este repositorio es visible con fines de **demostración y portfolio**. Ver o clonar el código **no otorga derecho de uso** en producción. Para licenciar Norvik (usuario único, organización, OEM o código bajo NDA), contacta:
+
+- [LinkedIn — Yoandy Ramirez Delgado](https://www.linkedin.com/in/yoandyrd92/)
+- [GitHub — heindall92](https://github.com/heindall92)
 
 ### Dependencias de terceros
 
@@ -88,6 +96,7 @@ Consulta el archivo [LICENSE](LICENSE) para los términos completos. Para licenc
 | PySide6 / Qt | LGPL / comercial Qt |
 | ReportLab | BSD |
 | Ollama SDK | MIT |
+| keyring | MIT |
 | GSAP (vendor) | [GreenSock Standard License](https://gsap.com/standard-license) |
 | Three.js (assets) | MIT |
 

@@ -582,7 +582,8 @@ function initDashFilters() {
     filteredTableLimit += 12;
     renderFilteredTable();
   });
-  document.getElementById('empty-import')?.addEventListener('click', () => navigateTo('reports'));
+  document.getElementById('empty-import')?.addEventListener('click', () => loadDemoData());
+  document.getElementById('btn-clear-demo')?.addEventListener('click', () => clearDemoData());
 
   document.querySelectorAll('#filter-risk-grid .filter-risk').forEach((btn) => {
     btn.addEventListener('click', () => btn.classList.toggle('is-active'));
@@ -621,6 +622,39 @@ function callBridge(method, ...args) {
       } catch {
         resolve(raw);
       }
+    }).catch(reject);
+  });
+}
+
+const aiPending = new Map();
+
+function onAiTaskFinished(raw) {
+  let payload;
+  try {
+    payload = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  } catch {
+    return;
+  }
+  const resolve = aiPending.get(payload.request_id);
+  if (!resolve) return;
+  aiPending.delete(payload.request_id);
+  resolve(payload.result || { ok: false, error: 'Respuesta IA vacía' });
+}
+
+function callBridgeAi(method, ...args) {
+  return new Promise((resolve, reject) => {
+    callBridge(method, ...args).then((data) => {
+      if (data && data.pending && data.request_id) {
+        aiPending.set(data.request_id, resolve);
+        setTimeout(() => {
+          if (aiPending.has(data.request_id)) {
+            aiPending.delete(data.request_id);
+            reject(new Error('Tiempo de espera agotado (IA). Comprueba Ollama.'));
+          }
+        }, 190000);
+        return;
+      }
+      resolve(data);
     }).catch(reject);
   });
 }
@@ -833,12 +867,44 @@ function severityMaturityPct(severity) {
   return 82;
 }
 
+function updateDemoUi(data) {
+  const isDemo = !!(data && data.demo_mode);
+  document.getElementById('demo-badge')?.toggleAttribute('hidden', !isDemo);
+  document.getElementById('demo-banner')?.toggleAttribute('hidden', !isDemo);
+  document.getElementById('demo-banner-sep')?.toggleAttribute('hidden', !isDemo);
+  document.getElementById('btn-clear-demo')?.toggleAttribute('hidden', !isDemo);
+}
+
+async function loadDemoData() {
+  try {
+    const result = await callBridge('load_demo_data');
+    if (!result.ok) throw new Error(result.error || 'No se pudieron cargar los datos demo');
+    showToast(result.message || 'Datos de demostración cargados');
+    await refreshDashboard();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+async function clearDemoData() {
+  if (!window.confirm('¿Eliminar todos los datos de demostración? Las evaluaciones reales no se borran.')) return;
+  try {
+    const result = await callBridge('clear_demo_data');
+    if (!result.ok) throw new Error(result.error || 'No se pudieron eliminar los datos demo');
+    showToast(result.message || 'Datos demo eliminados');
+    await refreshDashboard();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
 function renderDashboard(data) {
   dashboardData = data;
+  updateDemoUi(data);
 
   const empty = document.getElementById('dash-empty');
   const content = document.getElementById('dash-content');
-  const isEmpty = (data.total_controls ?? 0) === 0;
+  const isEmpty = data.has_assessments === false;
   if (empty) empty.hidden = !isEmpty;
   if (content) content.hidden = isEmpty;
   if (isEmpty) {
@@ -1054,7 +1120,7 @@ async function generateExecSummary(source = 'dashboard') {
         + `Controles cumplidos: ${dashboardData.controls_met}. No conformes: ${dashboardData.non_compliant}. `
         + `Críticas: ${dashboardData.critical_count}, advertencias: ${dashboardData.warning_count}.`,
     };
-    const result = await callBridge('get_recommendations', JSON.stringify(gap));
+    const result = await callBridgeAi('get_recommendations', JSON.stringify(gap));
     if (result.ok && result.content) {
       lastSummaryText = result.content;
       const html = `<div class="ai-summary__text">${formatAiText(result.content)}</div>`;
@@ -1726,9 +1792,9 @@ async function askAiForGap(gap) {
   try {
     let result;
     if (gap.control_id === 'MANUAL') {
-      result = await callBridge('ai_chat', gap.notes || gap.title || '');
+      result = await callBridgeAi('ai_chat', gap.notes || gap.title || '');
     } else {
-      result = await callBridge('get_recommendations', JSON.stringify(gap));
+      result = await callBridgeAi('get_recommendations', JSON.stringify(gap));
     }
     const msgs = document.getElementById('ai-messages');
     msgs.removeChild(msgs.lastChild);
@@ -2265,6 +2331,9 @@ function initBridge() {
 
   new QWebChannel(qt.webChannelTransport, (channel) => {
     bridge = channel.objects.bridge;
+    if (bridge.aiTaskFinished && bridge.aiTaskFinished.connect) {
+      bridge.aiTaskFinished.connect(onAiTaskFinished);
+    }
     bootUi();
     defer(() => {
       loadSettings();

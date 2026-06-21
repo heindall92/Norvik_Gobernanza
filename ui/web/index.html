@@ -92,6 +92,7 @@
               <span data-icon="menu"></span>
             </button>
             <div class="norvik-topbar__title">
+              <span class="demo-badge" id="demo-badge" hidden aria-label="Modo demostración">DEMO</span>
               <h1 id="page-title">Governance & Compliance</h1>
               <p id="page-subtitle">Última revisión: —</p>
             </div>
@@ -145,13 +146,13 @@
                     </div>
                   </div>
                   <h2>No hay datos de cumplimiento todavía</h2>
-                  <p>Comience configurando su primer marco normativo o realizando una evaluación de madurez para visualizar el estado de riesgo de su organización.</p>
+                  <p>Comience configurando su primer marco normativo o cargue datos de demostración para explorar el dashboard sin evaluaciones reales.</p>
                   <div class="dash-empty__actions">
                     <button type="button" class="ws-btn primary" id="empty-start">
-                      <span data-icon="verified"></span><span>Comenzar configuración</span>
+                      <span data-icon="verified"></span><span>Comenzar evaluación</span>
                     </button>
                     <button type="button" class="ws-btn" id="empty-import">
-                      <span data-icon="upload"></span><span>Importar datos</span>
+                      <span data-icon="sparkle"></span><span>Cargar datos de demostración</span>
                     </button>
                   </div>
                   <div class="dash-empty__tips">
@@ -195,9 +196,14 @@
                     </span>
                     <span class="dash-header__sep" aria-hidden="true">·</span>
                     <span class="dash-header__time" id="dash-last-update">Última actualización: —</span>
+                    <span class="dash-header__sep demo-banner__sep" id="demo-banner-sep" hidden aria-hidden="true">·</span>
+                    <span class="demo-banner" id="demo-banner" hidden>Datos de demostración — no válidos para auditoría</span>
                   </div>
                 </div>
                 <div class="dash-header__actions">
+                  <button type="button" class="ws-btn ws-btn--warn" id="btn-clear-demo" hidden>
+                    <span data-icon="close"></span><span>Quitar demo</span>
+                  </button>
                   <button type="button" class="ws-btn" id="btn-sync">
                     <span data-icon="sync"></span><span>Sincronizar</span>
                   </button>
