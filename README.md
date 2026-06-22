@@ -1,8 +1,16 @@
+
+
 # Norvik — Governance & Compliance
 
 **Norvik** es una aplicación de escritorio para **gobernanza, riesgo y cumplimiento (GRC)**. Permite evaluar madurez bajo marcos normativos, visualizar brechas, generar informes PDF con análisis asistido por IA y gestionar evidencias de cumplimiento.
 
 Desarrollado por [Yoandy Ramirez Delgado](https://www.linkedin.com/in/yoandyrd92/).
+
+
+https://github.com/user-attachments/assets/57db5c65-1be7-4db5-96a7-8a216ce1b816
+
+
+
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![PySide6](https://img.shields.io/badge/PySide6-6.7%2B-green)
