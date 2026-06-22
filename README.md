@@ -6,15 +6,37 @@
 
 Desarrollado por [Yoandy Ramirez Delgado](https://www.linkedin.com/in/yoandyrd92/).
 
-
-https://github.com/user-attachments/assets/57db5c65-1be7-4db5-96a7-8a216ce1b816
-
-
-
-
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![PySide6](https://img.shields.io/badge/PySide6-6.7%2B-green)
 ![License](https://img.shields.io/badge/License-Propietaria-red)
+
+## Demo en vídeo
+
+https://github.com/user-attachments/assets/57db5c65-1be7-4db5-96a7-8a216ce1b816
+
+## Galería de la interfaz
+
+Carrusel interactivo en el portfolio (fan carousel con GSAP): **[yoandyramirez.com/projects/norvik-gobernanza](https://yoandyramirez.com/projects/norvik-gobernanza)**
+
+### Dashboards — temas visuales
+
+| Azul | Claro | Verde | Naranja |
+|:---:|:---:|:---:|:---:|
+| ![Dashboard tema azul](docs/screenshots/01-dashboard-azul.png) | ![Dashboard tema claro](docs/screenshots/02-dashboard-blanco.png) | ![Dashboard tema verde](docs/screenshots/03-dashboard-verde.png) | ![Dashboard tema naranja](docs/screenshots/04-dashboard-naranja.png) |
+
+| Rojo (alto contraste) |
+|:---:|
+| ![Dashboard tema rojo](docs/screenshots/07-dashboard-rojo.png) |
+
+### Módulos GRC
+
+| Frameworks normativos | CIS Controls v8 | Notificaciones |
+|:---:|:---:|:---:|
+| ![Selector NIST · ISO · CIS · RGPD](docs/screenshots/05-frameworks.png) | ![Evaluación CMM L0–L5](docs/screenshots/06-cis-controls.png) | ![Centro de notificaciones](docs/screenshots/08-notificaciones.png) |
+
+| Configuración & IA | Perfil de usuario |
+|:---:|:---:|
+| ![Temas, Ollama local/cloud](docs/screenshots/09-configuracion.png) | ![Organización y enlaces profesionales](docs/screenshots/10-perfil.png) |
 
 ## Características
 
